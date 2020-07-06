@@ -90,30 +90,30 @@ namespace Loaders
 		IWICImagingFactory* pWICImagingFactory = nullptr;
 		hr = CoCreateInstance(CLSID_WICImagingFactory, NULL, CLSCTX_INPROC_SERVER, IID_IWICImagingFactory, (LPVOID*)&pWICImagingFactory);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Create imaging factory", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create imaging factory", MB_OK);
 			goto cleanup;
 		}
 
 		hr = pWICImagingFactory->CreateDecoderFromFilename(filename, NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &pDecoder);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Create Decoder from filename", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Decoder from filename", MB_OK);
 			goto cleanup;
 		}
 
 		hr = pDecoder->GetFrame(0, &pFrame);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "GetFrame", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "GetFrame", MB_OK);
 			goto cleanup;
 		}
 		hr = WICConvertBitmapSource(GUID_WICPixelFormat32bppRGBA, pFrame, &pConvertedFrame);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Convert Bitmap", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Convert Bitmap", MB_OK);
 			goto cleanup;
 		}
 
 		hr = pWICImagingFactory->CreateBitmapFromSource(pConvertedFrame, WICBitmapCacheOnDemand, &pBitmap);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Create Bitmap", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Bitmap", MB_OK);
 			goto cleanup;
 		}
 
@@ -122,7 +122,7 @@ namespace Loaders
 		rcLock.Height = height;
 		hr = pBitmap->Lock(&rcLock, WICBitmapLockWrite, &pLock);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Lock Bitmap", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Lock Bitmap", MB_OK);
 			goto cleanup;
 		}
 
@@ -131,7 +131,7 @@ namespace Loaders
 			BYTE* pv = nullptr;
 			hr = pLock->GetDataPointer(&cbBufferSize, &pv);
 			if (FAILED(hr)) {
-				MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Get Image Data Pointer", MB_OK);
+				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Get Image Data Pointer", MB_OK);
 				goto cleanup;
 			}
 

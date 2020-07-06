@@ -23,7 +23,7 @@ namespace Engine
 
 		hr = device->CreateBuffer(&bd, &vertex_data, &m_pVBuffer);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Mesh Error", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Mesh Error", MB_OK);
 			if (m_pVBuffer) {
 				m_pVBuffer->Release();
 			}

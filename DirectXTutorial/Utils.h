@@ -8,7 +8,7 @@ namespace Engine
 {
 namespace Utils
 {
-	std::string GetLastErrorAsString(HRESULT hr);
+	std::string GetHRErrorString(HRESULT hr);
 
 }
 }

@@ -1,6 +1,6 @@
 #include "Utils.h"
 
-std::string Engine::Utils::GetLastErrorAsString(HRESULT hr)
+std::string Engine::Utils::GetHRErrorString(HRESULT hr)
 {
    //Get the error message, if any.
    if (!FAILED(hr))

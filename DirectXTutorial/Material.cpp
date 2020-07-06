@@ -73,14 +73,14 @@ namespace Engine
 		}
 		hr = device->CreatePixelShader(PS->GetBufferPointer(), PS->GetBufferSize(), nullptr, &m_pPixelShader);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Pixel Shader Error", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Pixel Shader Error", MB_OK);
 			Destroy();
 			return false;
 		}
 
 		hr = device->CreateInputLayout(inputDesc, numInputs, VS->GetBufferPointer(), VS->GetBufferSize(), &m_pLayout);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "CreateInputLayout Error", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "CreateInputLayout Error", MB_OK);
 			Destroy();
 			return false;
 		}

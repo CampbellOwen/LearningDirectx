@@ -188,7 +188,7 @@ void InitD3D(HWND hWnd)
 	descDepth.MiscFlags = 0;
 	HRESULT hr = dev->CreateTexture2D(&descDepth, NULL, &pDepthStencil);
 	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Create Depth Texture", MB_OK);
+		MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Depth Texture", MB_OK);
 	}
 
 	D3D11_DEPTH_STENCIL_DESC dsDesc;
@@ -233,7 +233,7 @@ void InitD3D(HWND hWnd)
 	// Create the depth stencil view
 	hr = dev->CreateDepthStencilView(pDepthStencil, &descDSV, &pDepthStencilView);
 	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Create Depth Stencil View", MB_OK);
+		MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Depth Stencil View", MB_OK);
 	}
 
 	pDepthStencil->Release();

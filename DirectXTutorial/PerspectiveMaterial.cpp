@@ -18,7 +18,7 @@ bool Engine::PerspectiveMaterial::SetConstantBuffer(ID3D11Device* device, const 
 
 	HRESULT hr = device->CreateBuffer(&cbDesc, &initData, &m_pConstantBuffer);
 	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "CreateConstantBuffer", MB_OK);
+		MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "CreateConstantBuffer", MB_OK);
 		Destroy();
 		return false;
 	}
@@ -33,7 +33,7 @@ bool Engine::PerspectiveMaterial::UpdateConstantBuffer(ID3D11DeviceContext* devi
 
 	HRESULT hr = deviceContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Engine::Utils::GetLastErrorAsString(hr).c_str(), "Map constant buffer", MB_OK);
+		MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Map constant buffer", MB_OK);
 		return false;
 	}
 
