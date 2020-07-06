@@ -29,4 +29,12 @@
 # Executables
 *.exe
 *.out
-*.app
+*.appo
+
+
+*.tlog
+*.pdb
+*.idb
+
+Debug/*
+.vs/*
