@@ -301,7 +301,7 @@ void InitPipeline(void)
 	perspectiveMaterial.Init(dev, vertexShader, pixelShader, ied, 4);
 
 	ID3D11Resource* texture;
-	HRESULT hr = Engine::Loaders::LoadImageW(dev, devCon, L"F:\\Models\\JapaneseTemple\\Textures\\albedo-flipped.png", &texture);
+	HRESULT hr = Engine::Loaders::LoadImageW(dev, devCon, L"F:\\Models\\JapaneseTemple\\Textures\\albedo.png", &texture);
 	perspectiveMaterial.AddTexture(dev, texture);
 	
 	Engine::PerspectiveConstantBuffer cBuffer;

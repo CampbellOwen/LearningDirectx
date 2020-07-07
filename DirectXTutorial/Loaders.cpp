@@ -82,8 +82,9 @@ namespace Loaders
 		IWICBitmapDecoder* pDecoder = nullptr;
 		IWICBitmapFrameDecode* pFrame = nullptr;
 		IWICBitmap* pBitmap = nullptr;
-		IWICBitmapSource *pConvertedFrame = NULL;
+		IWICBitmapSource *pConvertedFrame = nullptr;
 		IWICBitmapLock* pLock = nullptr;
+		IWICBitmapFlipRotator* pBitmapFlipRotator = nullptr;
 		HRESULT hr = S_OK;
 		UINT width, height;
 		WICRect rcLock = { 0,0,0,0 };
@@ -112,14 +113,27 @@ namespace Loaders
 			goto cleanup;
 		}
 
-		pConvertedFrame->GetSize(&width,&height);
+		// PNG are top down, flip image so 0,0 is bottom left
+		hr = pWICImagingFactory->CreateBitmapFlipRotator(&pBitmapFlipRotator);
+		if (FAILED(hr)) {
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create bitmap flip rotator", MB_OK);
+			goto cleanup;
+		}
+
+		hr = pBitmapFlipRotator->Initialize(pConvertedFrame, WICBitmapTransformFlipVertical);
+		if (FAILED(hr)) {
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Flip pixels", MB_OK);
+			goto cleanup;
+		}
+
+		pBitmapFlipRotator->GetSize(&width,&height);
 		rcLock.Width = width;
 		rcLock.Height = height;
 
 		{
 			auto rawBuffer = std::unique_ptr<BYTE[]>(new BYTE[width*height*4]);
 
-			hr = pConvertedFrame->CopyPixels(&rcLock, 4 * width, width * height * 4, rawBuffer.get());
+			hr = pBitmapFlipRotator->CopyPixels(&rcLock, 4 * width, width * height * 4, rawBuffer.get());
 
 			if (FAILED(hr)) {
 				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Copy Pixels", MB_OK);
@@ -158,6 +172,7 @@ namespace Loaders
 		}
 
 cleanup:
+		if (pBitmapFlipRotator) pBitmapFlipRotator->Release();
 		if (pLock) pLock->Release();
 		if (pWICImagingFactory) pWICImagingFactory->Release();
 		if (pDecoder) pDecoder->Release();
