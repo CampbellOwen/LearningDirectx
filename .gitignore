@@ -36,5 +36,7 @@
 *.pdb
 *.idb
 
+*.log
+*.vcxproj.FileListAbsolute.txt
 Debug/*
 .vs/*

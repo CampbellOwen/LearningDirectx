@@ -299,42 +299,22 @@ void InitPipeline(void)
 	const Engine::ShaderInfo pixelShader{ L"shaders.hlsl", "PShader" };
 	//basicMaterial.Init(dev, vertexShader, pixelShader, ied, 4);
 	perspectiveMaterial.Init(dev, vertexShader, pixelShader, ied, 4);
+
+	ID3D11Resource* texture;
+	HRESULT hr = Engine::Loaders::LoadImageW(dev, devCon, L"F:\\Models\\JapaneseTemple\\Textures\\albedo.png", &texture);
+	perspectiveMaterial.AddTexture(dev, texture);
+	
 	Engine::PerspectiveConstantBuffer cBuffer;
 	cBuffer.worldTransform = DirectX::XMMatrixRotationY(0.785398f);
 	cBuffer.worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(0, -5, 35);
 	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
 	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(0.785398f, 1.7f, 0.1f, 100.0f);
-	perspectiveMaterial.SetConstantBuffer(dev, cBuffer);
+	perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
 }
 
 void InitGraphics(void)
 {
-	
-	std::vector<Engine::VERTEX> vertices = {
-		{
-			{0.0f, 0.5f, 1.0f}, // Position
-			{0.0f, 0.0f, 0.0f}, // Normal
-			{0.0f, 0.0f}, // UV
-			{1.0f, 0.0f, 0.0f, 1.0f} // Color
-		},
-		{
-			{0.45f, -0.5f, 1.0f},
-			{0.0f, 0.0f, 0.0f},
-			{0.0f, 0.0f},
-			{0.0f, 1.0f, 0.0f, 1.0f}
-		},
-		{
-			{-0.45f, -0.5f, 1.0f},
-			{0.0f, 0.0f, 0.0f},
-			{0.0f, 0.0f},
-			{0.0f, 0.0f, 1.0f, 1.0f}
-		},
-	};
-
-	//triangle.Init(dev, devCon, vertices);
-
 	const std::vector<Engine::VERTEX> temple = Engine::Loaders::LoadObj("F:\\Models\\JapaneseTemple\\model.obj");
-	const std::vector<Engine::PixelData> albedo = Engine::Loaders::LoadImageW(L"F:\\Models\\JapaneseTemple\\Textures\\albedo.png");
 	triangle.Init(dev, devCon, temple);
 }

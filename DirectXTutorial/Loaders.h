@@ -2,20 +2,22 @@
 
 #include "Mesh.h"
 
+#include <d3d11.h>
+
 #include <string>
 #include <vector>
 
 namespace Engine
 {
-	struct PixelData
-	{
-		uint8_t R, G, B, A;
-	};
-
 namespace Loaders
 {
 	std::vector<Engine::VERTEX> LoadObj(const std::string& filename);
-	std::vector<PixelData> LoadImage(LPCWSTR filename);
+	HRESULT LoadImage(
+		ID3D11Device* device, 
+		ID3D11DeviceContext* deviceContext, 
+		LPCWSTR filename, 
+		ID3D11Resource** texture
+	);
 
 } // namespace Loaders
 } // namespace Engine

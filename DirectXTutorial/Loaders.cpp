@@ -73,17 +73,19 @@ namespace Loaders
 		return vertices;
 	}
 
-	std::vector<PixelData> LoadImage(LPCWSTR filename)
+	HRESULT LoadImage(
+		ID3D11Device* device, 
+		ID3D11DeviceContext* deviceContext, 
+		LPCWSTR filename, 
+		ID3D11Resource** texture)
 	{
-		std::vector<PixelData> pixelData;
-
-
 		IWICBitmapDecoder* pDecoder = nullptr;
 		IWICBitmapFrameDecode* pFrame = nullptr;
 		IWICBitmap* pBitmap = nullptr;
-		IWICBitmapSource *pConvertedFrame = NULL;
+		IWICBitmapSource *pConvertedFrame = nullptr;
 		IWICBitmapLock* pLock = nullptr;
-		HRESULT hr;
+		IWICBitmapFlipRotator* pBitmapFlipRotator = nullptr;
+		HRESULT hr = S_OK;
 		UINT width, height;
 		WICRect rcLock = { 0,0,0,0 };
 
@@ -111,39 +113,66 @@ namespace Loaders
 			goto cleanup;
 		}
 
-		hr = pWICImagingFactory->CreateBitmapFromSource(pConvertedFrame, WICBitmapCacheOnDemand, &pBitmap);
+		// PNG are top down, flip image so 0,0 is bottom left
+		hr = pWICImagingFactory->CreateBitmapFlipRotator(&pBitmapFlipRotator);
 		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Bitmap", MB_OK);
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create bitmap flip rotator", MB_OK);
 			goto cleanup;
 		}
 
-		pFrame->GetSize(&width,&height);
+		hr = pBitmapFlipRotator->Initialize(pConvertedFrame, WICBitmapTransformFlipVertical);
+		if (FAILED(hr)) {
+			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Flip pixels", MB_OK);
+			goto cleanup;
+		}
+
+		pBitmapFlipRotator->GetSize(&width,&height);
 		rcLock.Width = width;
 		rcLock.Height = height;
-		hr = pBitmap->Lock(&rcLock, WICBitmapLockWrite, &pLock);
-		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Lock Bitmap", MB_OK);
-			goto cleanup;
-		}
 
 		{
-			UINT cbBufferSize = 0;
-			BYTE* pv = nullptr;
-			hr = pLock->GetDataPointer(&cbBufferSize, &pv);
+			auto rawBuffer = std::unique_ptr<BYTE[]>(new BYTE[width*height*4]);
+
+			hr = pBitmapFlipRotator->CopyPixels(&rcLock, 4 * width, width * height * 4, rawBuffer.get());
+
 			if (FAILED(hr)) {
-				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Get Image Data Pointer", MB_OK);
+				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Copy Pixels", MB_OK);
 				goto cleanup;
 			}
 
-			PixelData* pixels = reinterpret_cast<PixelData*>(pv);
-			for (int i = 0; i < cbBufferSize / 4; i ++ ) {
-				pixelData.push_back(pixels[i]);
+			D3D11_TEXTURE2D_DESC desc;
+			ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+
+			desc.Width = width;
+			desc.Height = height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+
+			D3D11_SUBRESOURCE_DATA initData;
+			ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+			initData.pSysMem = rawBuffer.get();
+			initData.SysMemPitch = (width * 4);
+			initData.SysMemSlicePitch = (width * height);
+
+			ID3D11Texture2D* tex = nullptr;
+			hr = device->CreateTexture2D(&desc, &initData, &tex);
+			if (FAILED(hr)) {
+				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Texure", MB_OK);
+				goto cleanup;
 			}
+
+			*texture = tex;
 		}
 
-
 cleanup:
-
+		if (pBitmapFlipRotator) pBitmapFlipRotator->Release();
 		if (pLock) pLock->Release();
 		if (pWICImagingFactory) pWICImagingFactory->Release();
 		if (pDecoder) pDecoder->Release();
@@ -151,7 +180,7 @@ cleanup:
 		if (pBitmap) pBitmap->Release();
 		if (pConvertedFrame) pConvertedFrame->Release();
 
-		return pixelData;
+		return hr;
 	}
 }
 }

@@ -15,7 +15,7 @@ namespace Engine
 	class Material
 	{
 	public:
-		bool Init(
+		virtual bool Init(
 			ID3D11Device* device,
 			const ShaderInfo& vertexShader,
 			const ShaderInfo& pixelShader,
