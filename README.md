@@ -16,5 +16,5 @@ Hopefully I'll make something that I can use as a base for future projects!
 ![Upside down texture](/images/06-07-2020-BadTexture.png)
 Issues with the newly added texture loading code - it's upside down!
 
-![Good texture](/images/06-07-2020-BadTexture.png)
+![Good texture](/images/06-07-2020-GoodTexture.png)
 After correcting it. Need to implement mipmaps but would rather start on the camera :)
