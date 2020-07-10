@@ -22,3 +22,6 @@ After correcting it. Need to implement mipmaps but would rather start on the cam
 ### July 9, 2020
 Added position controls, using DearImGui
 ![Position controls](/images/09-07-2020-PositionControl.png)
+
+More controls!
+![More controls](/images/09-07-2020-RotationCameraControl.png)
