@@ -4,6 +4,9 @@
 #include <iostream>
 #include <vector>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
@@ -311,13 +314,20 @@ void RenderFrame(void)
 		static float x = 0.0f;
 		static float y = 0.0f;
 		static float z = 0.0f;
+		static float rotx = 0.0f;
+		static float roty = 0.0f;
+		static float rotz = 0.0f;
+		static float fov = 0.785398f;
+		static float aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
+		static float nearZ = 1.0f;
+		static float farZ = 50.0f;
 
 		Engine::PerspectiveConstantBuffer cBuffer;
-	cBuffer.worldTransform = DirectX::XMMatrixRotationY(0.785398f);
+	cBuffer.worldTransform = DirectX::XMMatrixRotationRollPitchYaw(rotx, roty, rotz);
 	cBuffer.worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(x,y,z);
 	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
-	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(0.785398f, 1.7f, 0.1f, 100.0f);
+	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
 		perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
 
 	devCon->ClearRenderTargetView(backbuffer, cornflowerBlue);
@@ -335,18 +345,30 @@ void RenderFrame(void)
 	ImGui::NewFrame();
 	{
 
-		ImGui::Begin("Object Controls");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Object Controls");
 
 		ImGui::Text("Position");
+		ImGui::SliderFloat("X", &x, -30.0f, 30.0f);
+		ImGui::SliderFloat("Y", &y, -30.0f, 30.0f);
+		ImGui::SliderFloat("Z", &z, -30.0f, 30.0f);
 
-		ImGui::SliderFloat("X", &x, -30.0f, 30.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::SliderFloat("Y", &y, -30.0f, 30.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::SliderFloat("Z", &z, -30.0f, 30.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::Text("Rotation");
+		ImGui::SliderFloat("Rotation X", &rotx, 0.0f, M_PI * 2.0f);
+		ImGui::SliderFloat("Rotation Y", &roty, 0.0f, M_PI * 2.0f);
+		ImGui::SliderFloat("Rotation Z", &rotz, 0.0f, M_PI * 2.0f);
 
 		ImGui::Text("Clear Colour");
-		ImGui::ColorEdit3("clear color", (float*)&cornflowerBlue); // Edit 3 floats representing a color
+		ImGui::ColorEdit3("clear color", (float*)&cornflowerBlue);
 
 		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+	{
+		ImGui::Begin("Camera Controls");
+		ImGui::SliderFloat("FOV", &fov, 0.1f, M_PI);
+		//ImGui::SliderFloat("Aspect Ratio", &aspectRatio, -30.0f, 30.0f);
+		ImGui::SliderFloat("Near Z", &nearZ, 0, 10.0f);
+		ImGui::SliderFloat("Far Z", &farZ, 0, 100.0f);
 		ImGui::End();
 	}
 
