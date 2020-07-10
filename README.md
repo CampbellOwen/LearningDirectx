@@ -18,3 +18,7 @@ Issues with the newly added texture loading code - it's upside down!
 
 ![Good texture](/images/06-07-2020-GoodTexture.png)
 After correcting it. Need to implement mipmaps but would rather start on the camera :)
+
+### July 9, 2020
+Added position controls, using DearImGui
+![Position controls](/images/09-07-2020-PositionControl.png)
