@@ -8,6 +8,10 @@
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
 #include "Loaders.h"
 #include "Material.h"
 #include "PerspectiveMaterial.h"
@@ -116,8 +120,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	return msg.wParam;
 }
 
+// Forward declare message handler from imgui_impl_win32.cpp
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+	{
+		return true;
+	}
 	switch (message)
 	{
 	case WM_DESTROY:
@@ -128,6 +139,24 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+void InitDearImGUI(HWND hWnd)
+{
+	// Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplWin32_Init(hWnd);
+    ImGui_ImplDX11_Init(dev, devCon);
 }
 
 void InitD3D(HWND hWnd)
@@ -255,12 +284,17 @@ void InitD3D(HWND hWnd)
 
 	devCon->RSSetViewports(1, &viewport);
 
+	InitDearImGUI(hWnd);
 	InitPipeline();
 	InitGraphics();
 }
 
 void CleanD3D()
 {
+	 ImGui_ImplDX11_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+
 	swapchain->SetFullscreenState(FALSE, NULL);
 
 	swapchain->Release();
@@ -273,7 +307,19 @@ void CleanD3D()
 void RenderFrame(void)
 {
 	// Clear back buffer
-	const float cornflowerBlue[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	static float cornflowerBlue[] = { 0.0f, 0.2f, 0.4f, 1.0f };
+		static float x = 0.0f;
+		static float y = 0.0f;
+		static float z = 0.0f;
+
+		Engine::PerspectiveConstantBuffer cBuffer;
+	cBuffer.worldTransform = DirectX::XMMatrixRotationY(0.785398f);
+	cBuffer.worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
+	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(x,y,z);
+	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
+	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(0.785398f, 1.7f, 0.1f, 100.0f);
+		perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
+
 	devCon->ClearRenderTargetView(backbuffer, cornflowerBlue);
 	devCon->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -282,6 +328,30 @@ void RenderFrame(void)
 	perspectiveMaterial.Activate(devCon);
 	triangle.Render(devCon);
 	devCon->Draw(triangle.NumberVertices(), 0);
+
+	// Start the Dear ImGui frame
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	{
+
+		ImGui::Begin("Object Controls");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("Position");
+
+		ImGui::SliderFloat("X", &x, -30.0f, 30.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::SliderFloat("Y", &y, -30.0f, 30.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::SliderFloat("Z", &z, -30.0f, 30.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
+		ImGui::Text("Clear Colour");
+		ImGui::ColorEdit3("clear color", (float*)&cornflowerBlue); // Edit 3 floats representing a color
+
+		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	// Swap buffers
 	swapchain->Present(0, 0);
