@@ -25,3 +25,13 @@ Added position controls, using DearImGui
 
 More controls!
 ![More controls](/images/09-07-2020-RotationCameraControl.png)
+
+### Novermber 23, 2020
+Can't believe it's been 4 months!
+Decided to get back into this with some refactoring so no fancy screenshots this time
+- Pulled out UI rendering code into its own subsystem
+- Created an `Entity` class which holds a `Material` and a `Mesh`
+    - Hopefully this is the start of an actual `Scene` system
+- Started work on a `Camera` system
+
+See you in another 4 months :D
