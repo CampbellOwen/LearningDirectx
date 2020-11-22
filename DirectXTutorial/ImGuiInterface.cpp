@@ -12,8 +12,8 @@ void CameraControls::Render()
 {
 	ImGui::Begin("Camera Controls");
 	ImGui::SliderFloat("FOV", &fov, 0.1f, M_PI);
-	ImGui::SliderFloat("Aspect Ratio", &aspectRatio, -30.0f, 30.0f);
-	ImGui::SliderFloat("Near Z", &nearZ, 0, 10.0f);
+	ImGui::SliderFloat("Aspect Ratio", &aspectRatio, 0.0f, 3.0f);
+	ImGui::SliderFloat("Near Z", &nearZ, 0.001f, 10.0f);
 	ImGui::SliderFloat("Far Z", &farZ, 0, 100.0f);
 	ImGui::End();
 }

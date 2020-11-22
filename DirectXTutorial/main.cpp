@@ -318,8 +318,15 @@ void RenderFrame(void)
 		objectControlsState.x,
 		objectControlsState.y,
 		objectControlsState.z);
-	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
-	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(
+
+	cBuffer.cameraTransform = DirectX::XMMatrixTranslation(
+		0.0f,
+		0.0f,
+		-20.0f
+	);
+
+	cBuffer.cameraTransform = DirectX::XMMatrixInverse(nullptr, cBuffer.cameraTransform);
+	cBuffer.cameraTransform *= DirectX::XMMatrixPerspectiveFovLH(
 		cameraControlsState.fov, 
 		cameraControlsState.aspectRatio, 
 		cameraControlsState.nearZ, 
