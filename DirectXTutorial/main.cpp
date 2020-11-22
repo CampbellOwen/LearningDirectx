@@ -11,10 +11,6 @@
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
-
 #include "Entity.h"
 #include "ImGuiInterface.h"
 #include "Loaders.h"
@@ -147,24 +143,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
-}
-
-void InitDearImGUI(HWND hWnd)
-{
-	// Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer bindings
-    ImGui_ImplWin32_Init(hWnd);
-    ImGui_ImplDX11_Init(dev, devCon);
 }
 
 void InitUI(HWND hWnd)
