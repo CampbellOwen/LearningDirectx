@@ -332,21 +332,21 @@ void RenderFrame(void)
 
 	Engine::PerspectiveConstantBuffer cBuffer;
 	cBuffer.worldTransform = DirectX::XMMatrixRotationRollPitchYaw(
-		 objectControlsState.rotx, 
-		 objectControlsState.roty, 
-		 objectControlsState.rotz);
+		objectControlsState.rotx, 
+		objectControlsState.roty, 
+		objectControlsState.rotz);
 	cBuffer.worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(
-		 objectControlsState.x,
-		 objectControlsState.y,
-		 objectControlsState.z);
+		objectControlsState.x,
+		objectControlsState.y,
+		objectControlsState.z);
 	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
 	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(
-		 cameraControlsState.fov, 
-		 cameraControlsState.aspectRatio, 
-		 cameraControlsState.nearZ, 
-		 cameraControlsState.farZ);
-		perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
+		cameraControlsState.fov, 
+		cameraControlsState.aspectRatio, 
+		cameraControlsState.nearZ, 
+		cameraControlsState.farZ);
+	perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
 
 	// Clear render targets
 	devCon->ClearRenderTargetView(backbuffer, objectControlsState.backgroundColor);

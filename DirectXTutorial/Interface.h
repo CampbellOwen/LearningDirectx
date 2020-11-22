@@ -7,12 +7,12 @@ namespace UI
 
 class Controls
 {
-	 virtual void Render() = 0;
+	virtual void Render() = 0;
 };
 
 class Interface
 {
-	 virtual void Render() = 0;
+	virtual void Render() = 0;
 };
 
 } // namespace UI

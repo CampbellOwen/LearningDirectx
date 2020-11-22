@@ -10,59 +10,56 @@ namespace UI
 
 void CameraControls::Render()
 {
-		ImGui::Begin("Camera Controls");
-		ImGui::SliderFloat("FOV", &fov, 0.1f, M_PI);
-		ImGui::SliderFloat("Aspect Ratio", &aspectRatio, -30.0f, 30.0f);
-		ImGui::SliderFloat("Near Z", &nearZ, 0, 10.0f);
-		ImGui::SliderFloat("Far Z", &farZ, 0, 100.0f);
-		ImGui::End();
+	ImGui::Begin("Camera Controls");
+	ImGui::SliderFloat("FOV", &fov, 0.1f, M_PI);
+	ImGui::SliderFloat("Aspect Ratio", &aspectRatio, -30.0f, 30.0f);
+	ImGui::SliderFloat("Near Z", &nearZ, 0, 10.0f);
+	ImGui::SliderFloat("Far Z", &farZ, 0, 100.0f);
+	ImGui::End();
 }
 
 void ObjectControls::Render()
 {
 
-		ImGui::Begin("Object Controls");
+	ImGui::Begin("Object Controls");
 
-		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &x, -30.0f, 30.0f);
-		ImGui::SliderFloat("Y", &y, -30.0f, 30.0f);
-		ImGui::SliderFloat("Z", &z, -30.0f, 30.0f);
+	ImGui::Text("Position");
+	ImGui::SliderFloat("X", &x, -30.0f, 30.0f);
+	ImGui::SliderFloat("Y", &y, -30.0f, 30.0f);
+	ImGui::SliderFloat("Z", &z, -30.0f, 30.0f);
 
-		ImGui::Text("Rotation");
-		ImGui::SliderFloat("Rotation X", &rotx, 0.0f, M_PI * 2.0f);
-		ImGui::SliderFloat("Rotation Y", &roty, 0.0f, M_PI * 2.0f);
-		ImGui::SliderFloat("Rotation Z", &rotz, 0.0f, M_PI * 2.0f);
+	ImGui::Text("Rotation");
+	ImGui::SliderFloat("Rotation X", &rotx, 0.0f, M_PI * 2.0f);
+	ImGui::SliderFloat("Rotation Y", &roty, 0.0f, M_PI * 2.0f);
+	ImGui::SliderFloat("Rotation Z", &rotz, 0.0f, M_PI * 2.0f);
 
-		ImGui::Text("Clear Colour");
-		ImGui::ColorEdit3("clear color", (float*)&backgroundColor);
+	ImGui::Text("Clear Colour");
+	ImGui::ColorEdit3("clear color", (float*)&backgroundColor);
 
-		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+	ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
 }
 
 void ImGuiInterface::Init(HWND hWnd, ID3D11Device* dev, ID3D11DeviceContext* devCon)
 {
 	// Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
 
-    // Setup Platform/Renderer bindings
-    ImGui_ImplWin32_Init(hWnd);
-    ImGui_ImplDX11_Init(dev, devCon);
+	// Setup Platform/Renderer bindings
+	ImGui_ImplWin32_Init(hWnd);
+	ImGui_ImplDX11_Init(dev, devCon);
 }
 
 ImGuiInterface::~ImGuiInterface()
 {
-	 ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void ImGuiInterface::Render()
@@ -81,12 +78,12 @@ void ImGuiInterface::Render()
 
 CameraControls& ImGuiInterface::CameraState()
 {
-	 return m_CameraControls;
+	return m_CameraControls;
 }
 
 ObjectControls& ImGuiInterface::ObjectState()
 {
-	 return m_ObjectControls;
+	return m_ObjectControls;
 }
 
 } // namespace UI
