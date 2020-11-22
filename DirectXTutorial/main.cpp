@@ -16,6 +16,7 @@
 #include "imgui_impl_dx11.h"
 
 #include "Entity.h"
+#include "ImGuiInterface.h"
 #include "Loaders.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -32,6 +33,7 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
+static Engine::UI::ImGuiInterface ui;
 
 static IDXGISwapChain* swapchain;
 static ID3D11Device* dev;
@@ -165,6 +167,23 @@ void InitDearImGUI(HWND hWnd)
     ImGui_ImplDX11_Init(dev, devCon);
 }
 
+void InitUI(HWND hWnd)
+{
+	ui.Init(hWnd, dev, devCon);
+	auto& cameraControlsState = ui.CameraState();
+	auto& objectControlsState = ui.ObjectState();
+	cameraControlsState.aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
+	cameraControlsState.fov = 0.785398f;
+	cameraControlsState.nearZ = 1.0f;
+	cameraControlsState.farZ = 50.0;
+
+	// Nice and aesthetic default positioning :)
+	objectControlsState.x = -6.878f;
+	objectControlsState.y = -8.341;
+	objectControlsState.z = 30.0f;
+	objectControlsState.roty = 0.889f;
+}
+
 void InitD3D(HWND hWnd)
 {
 	// Initialize Direct3D
@@ -275,7 +294,6 @@ void InitD3D(HWND hWnd)
 
 	devCon->OMSetRenderTargets(1, &backbuffer, pDepthStencilView);
 
-
 	// Setup the Viewport
 
 	D3D11_VIEWPORT viewport;
@@ -290,17 +308,14 @@ void InitD3D(HWND hWnd)
 
 	devCon->RSSetViewports(1, &viewport);
 
-	InitDearImGUI(hWnd);
+	InitUI(hWnd);
 	InitPipeline();
 	InitGraphics();
 }
 
+
 void CleanD3D()
 {
-	 ImGui_ImplDX11_Shutdown();
-    ImGui_ImplWin32_Shutdown();
-    ImGui::DestroyContext();
-
 	swapchain->SetFullscreenState(FALSE, NULL);
 
 	swapchain->Release();
@@ -312,32 +327,32 @@ void CleanD3D()
 
 void RenderFrame(void)
 {
-	// Clear back buffer
-	static float cornflowerBlue[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-	static float x = 0.0f;
-	static float y = 0.0f;
-	static float z = 0.0f;
-	static float rotx = 0.0f;
-	static float roty = 0.0f;
-	static float rotz = 0.0f;
-	static float fov = 0.785398f;
-	static float aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
-	static float nearZ = 1.0f;
-	static float farZ = 50.0f;
+	auto cameraControlsState = ui.CameraState();
+	auto objectControlsState = ui.ObjectState();
 
 	Engine::PerspectiveConstantBuffer cBuffer;
-	cBuffer.worldTransform = DirectX::XMMatrixRotationRollPitchYaw(rotx, roty, rotz);
+	cBuffer.worldTransform = DirectX::XMMatrixRotationRollPitchYaw(
+		 objectControlsState.rotx, 
+		 objectControlsState.roty, 
+		 objectControlsState.rotz);
 	cBuffer.worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
-	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(x,y,z);
+	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(
+		 objectControlsState.x,
+		 objectControlsState.y,
+		 objectControlsState.z);
 	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
-	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(fov, aspectRatio, nearZ, farZ);
+	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(
+		 cameraControlsState.fov, 
+		 cameraControlsState.aspectRatio, 
+		 cameraControlsState.nearZ, 
+		 cameraControlsState.farZ);
 		perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
 
-	devCon->ClearRenderTargetView(backbuffer, cornflowerBlue);
+	// Clear render targets
+	devCon->ClearRenderTargetView(backbuffer, objectControlsState.backgroundColor);
 	devCon->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	// Render 3D
-
+	// Render entities
 	auto mesh = pagoda.GetMesh();
 	auto material = pagoda.GetMaterial();
 
@@ -345,41 +360,8 @@ void RenderFrame(void)
 	material->Activate(devCon);
 	devCon->Draw(mesh->NumberVertices(), 0);
 
-	// Start the Dear ImGui frame
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	{
-
-		ImGui::Begin("Object Controls");
-
-		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &x, -30.0f, 30.0f);
-		ImGui::SliderFloat("Y", &y, -30.0f, 30.0f);
-		ImGui::SliderFloat("Z", &z, -30.0f, 30.0f);
-
-		ImGui::Text("Rotation");
-		ImGui::SliderFloat("Rotation X", &rotx, 0.0f, M_PI * 2.0f);
-		ImGui::SliderFloat("Rotation Y", &roty, 0.0f, M_PI * 2.0f);
-		ImGui::SliderFloat("Rotation Z", &rotz, 0.0f, M_PI * 2.0f);
-
-		ImGui::Text("Clear Colour");
-		ImGui::ColorEdit3("clear color", (float*)&cornflowerBlue);
-
-		ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
-	}
-	{
-		ImGui::Begin("Camera Controls");
-		ImGui::SliderFloat("FOV", &fov, 0.1f, M_PI);
-		//ImGui::SliderFloat("Aspect Ratio", &aspectRatio, -30.0f, 30.0f);
-		ImGui::SliderFloat("Near Z", &nearZ, 0, 10.0f);
-		ImGui::SliderFloat("Far Z", &farZ, 0, 100.0f);
-		ImGui::End();
-	}
-
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	// Render UI last to draw on top of scene
+	ui.Render();
 
 	// Swap buffers
 	swapchain->Present(0, 0);
