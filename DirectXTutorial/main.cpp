@@ -15,10 +15,11 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+#include "Entity.h"
 #include "Loaders.h"
 #include "Material.h"
-#include "PerspectiveMaterial.h"
 #include "Mesh.h"
+#include "PerspectiveMaterial.h"
 #include "Utils.h"
 
 // Direct 3D Library files
@@ -48,6 +49,8 @@ static ID3D11InputLayout* pLayout;
 static Engine::Mesh triangle;
 //static Engine::Material basicMaterial;
 static Engine::PerspectiveMaterial perspectiveMaterial;
+
+static Engine::Entity pagoda;
 
 static DirectX::XMMATRIX perspectiveMatrix;
 
@@ -311,18 +314,18 @@ void RenderFrame(void)
 {
 	// Clear back buffer
 	static float cornflowerBlue[] = { 0.0f, 0.2f, 0.4f, 1.0f };
-		static float x = 0.0f;
-		static float y = 0.0f;
-		static float z = 0.0f;
-		static float rotx = 0.0f;
-		static float roty = 0.0f;
-		static float rotz = 0.0f;
-		static float fov = 0.785398f;
-		static float aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
-		static float nearZ = 1.0f;
-		static float farZ = 50.0f;
+	static float x = 0.0f;
+	static float y = 0.0f;
+	static float z = 0.0f;
+	static float rotx = 0.0f;
+	static float roty = 0.0f;
+	static float rotz = 0.0f;
+	static float fov = 0.785398f;
+	static float aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
+	static float nearZ = 1.0f;
+	static float farZ = 50.0f;
 
-		Engine::PerspectiveConstantBuffer cBuffer;
+	Engine::PerspectiveConstantBuffer cBuffer;
 	cBuffer.worldTransform = DirectX::XMMatrixRotationRollPitchYaw(rotx, roty, rotz);
 	cBuffer.worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
 	cBuffer.worldTransform *= DirectX::XMMatrixTranslation(x,y,z);
@@ -335,9 +338,12 @@ void RenderFrame(void)
 
 	// Render 3D
 
-	perspectiveMaterial.Activate(devCon);
-	triangle.Render(devCon);
-	devCon->Draw(triangle.NumberVertices(), 0);
+	auto mesh = pagoda.GetMesh();
+	auto material = pagoda.GetMaterial();
+
+	mesh->Activate(devCon);
+	material->Activate(devCon);
+	devCon->Draw(mesh->NumberVertices(), 0);
 
 	// Start the Dear ImGui frame
 	ImGui_ImplDX11_NewFrame();
@@ -403,6 +409,8 @@ void InitPipeline(void)
 	//cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveLH(2.0f, 1.0f, 0.1f, 50.0f);
 	cBuffer.cameraTransform = DirectX::XMMatrixPerspectiveFovLH(0.785398f, 1.7f, 0.1f, 100.0f);
 	perspectiveMaterial.UpdateConstantBuffer(devCon, cBuffer);
+
+	pagoda.Init(&triangle, &perspectiveMaterial);
 }
 
 void InitGraphics(void)

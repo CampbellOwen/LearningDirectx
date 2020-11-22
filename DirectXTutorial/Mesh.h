@@ -26,7 +26,7 @@ namespace Engine
 		bool Init(ID3D11Device* device, const ID3D11DeviceContext* deviceContext, const std::vector<VERTEX>& vertices);
 		void Destroy(void);
 		
-		void Render(ID3D11DeviceContext* deviceContext);
+		void Activate(ID3D11DeviceContext* deviceContext);
 		uint32_t NumberVertices(void);
 
 	private:
