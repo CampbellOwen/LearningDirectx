@@ -41,7 +41,7 @@ namespace Engine
 		if (m_pVBuffer) m_pVBuffer->Release();
 	}
 
-	void Mesh::Render(ID3D11DeviceContext* deviceContext)
+	void Mesh::Activate(ID3D11DeviceContext* deviceContext)
 	{
 		UINT stride = sizeof(VERTEX);
 		UINT offset = 0;

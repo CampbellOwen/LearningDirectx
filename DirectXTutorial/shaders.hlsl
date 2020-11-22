@@ -8,7 +8,7 @@ struct VOut
 	float2 texCoord: TEXCOORD;
 };
 
-cbuffer VS_CONSANT_BUFFER : register(b0)
+cbuffer VS_CONSTANT_BUFFER : register(b0)
 {
 	float4x4 camera;
 	float4x4 world;
