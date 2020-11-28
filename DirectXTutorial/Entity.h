@@ -1,7 +1,9 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <vector>
 
+#include "GraphicsDevice.h"
 #include "Material.h"
 #include "Mesh.h"
 
@@ -48,12 +50,40 @@ public:
 	 void SetScale(DirectX::XMFLOAT3 scale);
 	 void ApplyScale(DirectX::XMFLOAT3 scale);
 
+	 void SetParent(Entity* parent)
+	 {
+		 m_parent = parent;
+	 }
+
+	 Entity* GetParent()
+	 {
+		 return m_parent;
+	 }
+
+	 DirectX::XMMATRIX GetTransform()
+	 {
+		 return m_transform;
+	 }
+
+	 virtual void Update()
+	 {
+	 }
+
+	 void Bind(const GraphicsDevice& device);
+
+private:
+	void UpdateTransform();
+
 private:
 	 Material* m_pMaterial;
 	 Mesh* m_pMesh;
 	 DirectX::XMFLOAT3 m_position;
 	 DirectX::XMFLOAT3 m_rotation;
 	 DirectX::XMFLOAT3 m_scale;
+
+	 DirectX::XMMATRIX m_transform;
+
+	 Entity* m_parent;
 };
 
 } // namespace Engine

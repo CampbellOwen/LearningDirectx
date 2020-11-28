@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImGuiInterface.cpp" />
     <ClCompile Include="imgui_draw.cpp" />
@@ -149,7 +150,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="PagodaScene.cpp" />
     <ClCompile Include="PerspectiveMaterial.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="ImGuiInterface.h" />
@@ -175,7 +180,11 @@
     <ClInclude Include="imstb_textedit.h" />
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="PagodaScene.h" />
     <ClInclude Include="PerspectiveMaterial.h" />
+    <ClInclude Include="RenderPipeline.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Loaders.h" />
     <ClInclude Include="Material.h" />

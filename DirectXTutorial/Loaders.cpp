@@ -75,9 +75,8 @@ namespace Loaders
 
 	HRESULT LoadImage(
 		ID3D11Device* device, 
-		ID3D11DeviceContext* deviceContext, 
 		LPCWSTR filename, 
-		ID3D11Resource** texture)
+		ID3D11Texture2D** texture)
 	{
 		IWICBitmapDecoder* pDecoder = nullptr;
 		IWICBitmapFrameDecode* pFrame = nullptr;

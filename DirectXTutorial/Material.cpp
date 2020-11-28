@@ -93,6 +93,24 @@ namespace Engine
 		deviceContext->VSSetShader(m_pVertexShader, 0, 0);
 		deviceContext->PSSetShader(m_pPixelShader, 0, 0);
 		deviceContext->IASetInputLayout(m_pLayout);
+
+		std::vector<ID3D11ShaderResourceView*> textureViews;
+		for (auto& texture : m_textures)
+		{
+			textureViews.push_back(texture->pResourceView);
+		}
+		deviceContext->PSSetShaderResources(0, textureViews.size(), textureViews.data());
+		deviceContext->PSSetSamplers(0, m_samplerStates.size(), m_samplerStates.data());
+	}
+
+	void Material::AddSampler(ID3D11SamplerState* samplerState)
+	{
+		m_samplerStates.push_back(samplerState);
+	}
+
+	void Material::AddTexture(Texture* texture)
+	{
+		m_textures.push_back(texture);
 	}
 
 	void Material::Destroy()
