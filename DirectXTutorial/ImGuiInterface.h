@@ -23,8 +23,7 @@ struct ObjectControls : Controls
 	float roty;
 	float rotz;
 
-	// Default cornflower blue :)
-	float backgroundColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	float backgroundColor[4] = { 0.122f, 0.133f, 0.149f, 1.0f };
 
 	void Render() override;
 };
