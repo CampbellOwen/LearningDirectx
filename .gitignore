@@ -40,3 +40,4 @@
 *.vcxproj.FileListAbsolute.txt
 Debug/*
 .vs/*
+DirectXTutorial/imgui.ini
