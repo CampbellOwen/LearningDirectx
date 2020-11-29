@@ -40,6 +40,7 @@ static DirectX::XMMATRIX perspectiveMatrix;
 void InitD3D(HWND hWnd);
 void CleanD3D(void);
 
+void Update(void);
 void RenderFrame(void);
 void InitPipeline(void);
 
@@ -100,6 +101,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			}
 		}
 
+		Update();
 		RenderFrame();
 	}
 	
@@ -168,16 +170,30 @@ struct CameraConstantBuffer
 	DirectX::XMFLOAT4 cameraPos;
 };
 
+void Update()
+{
+	auto objectControlsState = ui.ObjectState();
+
+	Engine::Entity* mainPagoda = pagodaScene->GetEntity("Pagoda");
+	mainPagoda->SetPosition(DirectX::XMFLOAT3(objectControlsState.x, objectControlsState.y, objectControlsState.z));
+	mainPagoda->SetRotation(DirectX::XMFLOAT3(objectControlsState.rotx, objectControlsState.roty, objectControlsState.rotz));
+
+	for (auto& entity : pagodaScene->GetEntities())
+	{
+		entity->Update();
+	}
+}
+
+
 void RenderFrame(void)
 {
-	auto cameraControlsState = ui.CameraState();
-	auto objectControlsState = ui.ObjectState();
 
 	// Clear render targets
 	Engine::ClearDepth(*sp_graphicsDevice, sp_graphicsDevice->pDepthStencilView);
-	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRTV, objectControlsState.backgroundColor);
+	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRTV, ui.ObjectState().backgroundColor);
 
 	// Update constant buffer
+	auto cameraControlsState = ui.CameraState();
 	Engine::MappedGPUBuffer mappedCameraBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer);
 	{
 
@@ -201,25 +217,19 @@ void RenderFrame(void)
 
 	Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
 
-	Engine::Entity* mainPagoda = pagodaScene->GetEntity("Pagoda");
-
-	mainPagoda->SetPosition(DirectX::XMFLOAT3(objectControlsState.x, objectControlsState.y, objectControlsState.z));
-	mainPagoda->SetRotation(DirectX::XMFLOAT3(objectControlsState.rotx, objectControlsState.roty, objectControlsState.rotz));
-
 	// Render entities
 	auto entities = pagodaScene->GetEntities();
 	for (auto& entity : entities)
 	{
 		Engine::GPUBuffer& entityGPUBuffer = entity->GetMaterial()->GetGPUBuffer();
-
 		Engine::MappedGPUBuffer entityConstantBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, entityGPUBuffer);
 		{
 			Engine::PerspectiveConstantBuffer* pBuffer = reinterpret_cast<Engine::PerspectiveConstantBuffer*>(entityConstantBuffer.data);
 			pBuffer->worldTransform = entity->GetTransform();
 		}
 		Engine::UnmapConstantBuffer(*sp_graphicsDevice, entityConstantBuffer);
-		Engine::BindConstantBuffer(*sp_graphicsDevice, entityGPUBuffer, 1);
 
+		Engine::BindConstantBuffer(*sp_graphicsDevice, entityGPUBuffer, 1);
 		entity->Bind(*sp_graphicsDevice);
 		sp_graphicsDevice->pImmediateContext->Draw(entity->GetMesh()->NumberVertices(), 0);
 	}
