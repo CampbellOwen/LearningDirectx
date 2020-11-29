@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "GraphicsDevice.h"
 #include "Texture.h"
 
 namespace Engine
@@ -18,16 +19,21 @@ namespace Engine
 	{
 	public:
 		virtual bool Init(
-			ID3D11Device* device,
+			const GraphicsDevice& device,
 			const ShaderInfo& vertexShader,
 			const ShaderInfo& pixelShader,
 			const D3D11_INPUT_ELEMENT_DESC* inputDesc,
 			uint32_t numInputs );
 		virtual void Destroy();
 
-		virtual void Activate(ID3D11DeviceContext* deviceContext);
+		virtual void Activate(const GraphicsDevice& device);
 		void AddSampler(ID3D11SamplerState* samplerState);
 		void AddTexture(Texture* texture);
+
+		void AddGPUBuffer(const GraphicsDevice& device, void* buffer, size_t numBytes);
+		void AddGPUBuffer(const GraphicsDevice& device, size_t numBytes);
+		GPUBuffer& GetGPUBuffer();
+
 
 	private:
 		ID3D11VertexShader* m_pVertexShader;
@@ -35,5 +41,6 @@ namespace Engine
 		ID3D11InputLayout* m_pLayout;
 		std::vector<Texture*> m_textures;
 		std::vector<ID3D11SamplerState*> m_samplerStates;
+		GPUBuffer m_gpuBuffer;
 	};
 }

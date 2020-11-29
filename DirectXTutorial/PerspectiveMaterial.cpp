@@ -5,7 +5,7 @@
 namespace Engine
 {
 
-bool PerspectiveMaterial::Init(ID3D11Device* device)
+bool PerspectiveMaterial::Init(const GraphicsDevice& device)
 {
 	D3D11_INPUT_ELEMENT_DESC ied[] = {
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -32,13 +32,15 @@ bool PerspectiveMaterial::Init(ID3D11Device* device)
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	HRESULT hr = device->CreateSamplerState(&samplerDesc, &m_pSamplerState);
+	HRESULT hr = device.pDevice->CreateSamplerState(&samplerDesc, &m_pSamplerState);
 	if (FAILED(hr)) {
 		MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Sampler State", MB_OK);
 		return false;
 	}
 
 	Material::AddSampler(m_pSamplerState);
+
+	AddGPUBuffer(device, sizeof(PerspectiveConstantBuffer));
 
 	return true;
 }
@@ -54,9 +56,9 @@ void PerspectiveMaterial::Destroy()
 	}
 }
 
-void PerspectiveMaterial::Activate(ID3D11DeviceContext* deviceContext)
+void PerspectiveMaterial::Activate(const GraphicsDevice& device)
 {
-	Material::Activate(deviceContext);
+	Material::Activate(device);
 }
 
 } // namespace Engine

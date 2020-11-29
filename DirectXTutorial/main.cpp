@@ -32,7 +32,7 @@
 static Engine::UI::ImGuiInterface ui;
 
 static Engine::GraphicsDevice* sp_graphicsDevice;
-static Engine::GPUBuffer perspectiveConstantBuffer;
+static Engine::GPUBuffer cameraConstantBuffer;
 
 static Engine::Scene* pagodaScene;
 static DirectX::XMMATRIX perspectiveMatrix;
@@ -137,13 +137,13 @@ void InitUI(HWND hWnd)
 	cameraControlsState.aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
 	cameraControlsState.fov = 0.785398f;
 	cameraControlsState.nearZ = 1.0f;
-	cameraControlsState.farZ = 50.0;
+	cameraControlsState.farZ = 300.0f;
 
 	// Nice and aesthetic default positioning :)
 	objectControlsState.x = -6.878f;
 	objectControlsState.y = -8.341;
 	objectControlsState.z = 8.0;
-	objectControlsState.roty = 0.889f;
+	objectControlsState.roty = 2.421f;
 }
 
 void InitD3D(HWND hWnd)
@@ -161,6 +161,13 @@ void CleanD3D()
 	delete pagodaScene;
 }
 
+struct CameraConstantBuffer
+{
+	DirectX::XMMATRIX view;
+	DirectX::XMMATRIX projection;
+	DirectX::XMFLOAT4 cameraPos;
+};
+
 void RenderFrame(void)
 {
 	auto cameraControlsState = ui.CameraState();
@@ -171,41 +178,48 @@ void RenderFrame(void)
 	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRTV, objectControlsState.backgroundColor);
 
 	// Update constant buffer
-	Engine::MappedGPUBuffer mappedBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, &perspectiveConstantBuffer);
+	Engine::MappedGPUBuffer mappedCameraBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer);
 	{
-		Engine::PerspectiveConstantBuffer* pBuffer = reinterpret_cast<Engine::PerspectiveConstantBuffer*>(mappedBuffer.data);
 
-		pBuffer->worldTransform = DirectX::XMMatrixRotationRollPitchYaw(
-			objectControlsState.rotx, 
-			objectControlsState.roty, 
-			objectControlsState.rotz);
-		pBuffer->worldTransform *= DirectX::XMMatrixScaling(0.5f, 0.5f, 0.5f);
-		pBuffer->worldTransform *= DirectX::XMMatrixTranslation(
-			objectControlsState.x,
-			objectControlsState.y,
-			objectControlsState.z);
-
-		pBuffer->cameraTransform = DirectX::XMMatrixTranslation(
+		CameraConstantBuffer* pBuffer = reinterpret_cast<CameraConstantBuffer*>(mappedCameraBuffer.data);
+		pBuffer->view = DirectX::XMMatrixTranslation(
 			0.0f,
 			0.0f,
 			-20.0f
 		);
 
-		pBuffer->cameraTransform = DirectX::XMMatrixInverse(nullptr, pBuffer->cameraTransform);
-		pBuffer->cameraTransform *= DirectX::XMMatrixPerspectiveFovLH(
-			cameraControlsState.fov, 
-			cameraControlsState.aspectRatio, 
-			cameraControlsState.nearZ, 
+		pBuffer->view = DirectX::XMMatrixInverse(nullptr, pBuffer->view);
+		pBuffer->projection = DirectX::XMMatrixPerspectiveFovLH(
+			cameraControlsState.fov,
+			cameraControlsState.aspectRatio,
+			cameraControlsState.nearZ,
 			cameraControlsState.farZ);
-	}
-	Engine::UnmapConstantBuffer(*sp_graphicsDevice, mappedBuffer);
 
-	Engine::BindConstantBuffer(*sp_graphicsDevice, perspectiveConstantBuffer, 0);
+		pBuffer->cameraPos = DirectX::XMFLOAT4(0.0f, 0.0f, -20.0f, 1.0f);
+	}
+	Engine::UnmapConstantBuffer(*sp_graphicsDevice, mappedCameraBuffer);
+
+	Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
+
+	Engine::Entity* mainPagoda = pagodaScene->GetEntity("Pagoda");
+
+	mainPagoda->SetPosition(DirectX::XMFLOAT3(objectControlsState.x, objectControlsState.y, objectControlsState.z));
+	mainPagoda->SetRotation(DirectX::XMFLOAT3(objectControlsState.rotx, objectControlsState.roty, objectControlsState.rotz));
 
 	// Render entities
 	auto entities = pagodaScene->GetEntities();
 	for (auto& entity : entities)
 	{
+		Engine::GPUBuffer& entityGPUBuffer = entity->GetMaterial()->GetGPUBuffer();
+
+		Engine::MappedGPUBuffer entityConstantBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, entityGPUBuffer);
+		{
+			Engine::PerspectiveConstantBuffer* pBuffer = reinterpret_cast<Engine::PerspectiveConstantBuffer*>(entityConstantBuffer.data);
+			pBuffer->worldTransform = entity->GetTransform();
+		}
+		Engine::UnmapConstantBuffer(*sp_graphicsDevice, entityConstantBuffer);
+		Engine::BindConstantBuffer(*sp_graphicsDevice, entityGPUBuffer, 1);
+
 		entity->Bind(*sp_graphicsDevice);
 		sp_graphicsDevice->pImmediateContext->Draw(entity->GetMesh()->NumberVertices(), 0);
 	}
@@ -222,5 +236,6 @@ void InitPipeline(void)
 	pagodaScene = new Game::PagodaScene();
 	pagodaScene->Load(*sp_graphicsDevice);
 	 
-	perspectiveConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(Engine::PerspectiveConstantBuffer));
+	//perspectiveConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(Engine::PerspectiveConstantBuffer));
+	cameraConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(CameraConstantBuffer), nullptr);
 }

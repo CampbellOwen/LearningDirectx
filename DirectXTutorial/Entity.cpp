@@ -213,7 +213,7 @@ void Entity::Bind(const GraphicsDevice& device)
 
 	if (m_pMaterial)
 	{
-		m_pMaterial->Activate(device.pImmediateContext);
+		m_pMaterial->Activate(device);
 	}
 }
 

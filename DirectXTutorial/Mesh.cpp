@@ -8,7 +8,7 @@ namespace Engine
 		Destroy();
 	}
 
-	bool Mesh::Init(ID3D11Device* device, const ID3D11DeviceContext* deviceContext, const std::vector<VERTEX>& vertices)
+	bool Mesh::Init(const GraphicsDevice& device, const std::vector<VERTEX>& vertices)
 	{
 		HRESULT hr;
 		D3D11_BUFFER_DESC bd;
@@ -21,7 +21,7 @@ namespace Engine
 
 		const D3D11_SUBRESOURCE_DATA vertex_data{vertices.data(), 0, 0};
 
-		hr = device->CreateBuffer(&bd, &vertex_data, &m_pVBuffer);
+		hr = device.pDevice->CreateBuffer(&bd, &vertex_data, &m_pVBuffer);
 		if (FAILED(hr)) {
 			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Mesh Error", MB_OK);
 			if (m_pVBuffer) {

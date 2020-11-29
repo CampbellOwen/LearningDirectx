@@ -145,7 +145,7 @@ GraphicsDevice::~GraphicsDevice()
 	pDevice->Release();
 }
 
-GPUBuffer CreateConstantBuffer(const GraphicsDevice& device, size_t numBytes)
+GPUBuffer CreateConstantBuffer(const GraphicsDevice& device, size_t numBytes, void* initialData)
 {
 	GPUBuffer gpuBuffer;
 	gpuBuffer.numBytes = numBytes;
@@ -158,7 +158,14 @@ GPUBuffer CreateConstantBuffer(const GraphicsDevice& device, size_t numBytes)
 	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	HRESULT hr = device.pDevice->CreateBuffer(&cbDesc, nullptr, &gpuBuffer.pNativeBuffer);
+	D3D11_SUBRESOURCE_DATA resourceData;
+	if (initialData)
+	{
+		ZeroMemory(&resourceData, sizeof(resourceData));
+		resourceData.pSysMem = initialData;
+	}
+
+	HRESULT hr = device.pDevice->CreateBuffer(&cbDesc, initialData ? &resourceData : nullptr, &gpuBuffer.pNativeBuffer);
 	if (FAILED(hr)) {
 		MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "CreateConstantBuffer", MB_OK);
 	}
@@ -166,15 +173,15 @@ GPUBuffer CreateConstantBuffer(const GraphicsDevice& device, size_t numBytes)
 	return gpuBuffer;
 }
 
-MappedGPUBuffer MapConstantBuffer(const GraphicsDevice& device, GPUBuffer* pGpuBuffer)
+MappedGPUBuffer MapConstantBuffer(const GraphicsDevice& device, GPUBuffer& gpuBuffer)
 {
 	MappedGPUBuffer mappedBuffer;
-	mappedBuffer.gpuBuffer = pGpuBuffer;
+	mappedBuffer.gpuBuffer = &gpuBuffer;
 
 	D3D11_MAPPED_SUBRESOURCE resource;
 	ZeroMemory(&resource, sizeof(resource));
 
-	HRESULT hr = device.pImmediateContext->Map(pGpuBuffer->pNativeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	HRESULT hr = device.pImmediateContext->Map(gpuBuffer.pNativeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	if (FAILED(hr)) {
 		MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "Map constant buffer", MB_OK);
 	}

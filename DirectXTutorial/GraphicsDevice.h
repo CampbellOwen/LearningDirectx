@@ -1,5 +1,6 @@
 #pragma once
  
+#include <algorithm>
 #include <d3d11.h>
 #include <stdint.h>
 #include <windows.h>
@@ -37,6 +38,38 @@ struct GPUBuffer
 {
 	ID3D11Buffer* pNativeBuffer;
 	size_t numBytes;
+
+	GPUBuffer() : pNativeBuffer(nullptr), numBytes(0)
+	{
+	}
+
+	GPUBuffer(const GPUBuffer& buffer) : pNativeBuffer(buffer.pNativeBuffer), numBytes(buffer.numBytes)
+	{
+	}
+
+	GPUBuffer(GPUBuffer&& buffer) noexcept : pNativeBuffer(std::exchange(buffer.pNativeBuffer, nullptr)), numBytes(buffer.numBytes)
+	{
+	}
+
+	GPUBuffer& operator=(const GPUBuffer& buffer)
+	{
+		return *this = GPUBuffer(buffer);
+	}
+
+	GPUBuffer& operator=(GPUBuffer&& buffer) noexcept
+	{
+		std::swap(pNativeBuffer, buffer.pNativeBuffer);
+		numBytes = buffer.numBytes;
+		return *this;
+	}
+
+	~GPUBuffer()
+	{
+		if (pNativeBuffer)
+		{
+			pNativeBuffer->Release();
+		}
+	}
 };
 
 struct MappedGPUBuffer
@@ -45,8 +78,8 @@ struct MappedGPUBuffer
 	char* data;
 };
 
-GPUBuffer CreateConstantBuffer(const GraphicsDevice& device, size_t numBytes);
-MappedGPUBuffer MapConstantBuffer(const GraphicsDevice& device, GPUBuffer* pGpuBuffer);
+GPUBuffer CreateConstantBuffer(const GraphicsDevice& device, size_t numBytes, void* initialData);
+MappedGPUBuffer MapConstantBuffer(const GraphicsDevice& device, GPUBuffer& gpuBuffer);
 void UnmapConstantBuffer(const GraphicsDevice& device, const MappedGPUBuffer& mappedBuffer);
 void BindConstantBuffer(const GraphicsDevice& device, const GPUBuffer& gpuBuffer, uint32_t bindSlot);
 
