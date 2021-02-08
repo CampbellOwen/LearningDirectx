@@ -2,6 +2,7 @@
 
 #include "Loaders.h"
 #include "PerspectiveMaterial.h"
+#include "LightMaterial.h"
 
 namespace Game
 {
@@ -35,6 +36,14 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 	otherPagoda->SetPosition(DirectX::XMFLOAT3(20.0f, -8.341f, 50.0f));
 	otherPagoda->SetRotation(Engine::Axis::Y, 3.494f);
+
+	Engine::LightMaterial* lightMaterial = new Engine::LightMaterial();
+	lightMaterial->Init(device);
+
+	Engine::Entity* light = new Engine::Entity();
+	m_entities.emplace("Light", light);
+	light->Init(nullptr, lightMaterial);
+
 }
 
 } // namespace Game

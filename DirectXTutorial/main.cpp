@@ -23,18 +23,18 @@
 #include "Utils.h"
 
 // Direct 3D Library files
-#pragma comment (lib, "d3d11.lib")
-#pragma comment (lib, "d3dcompiler.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3dcompiler.lib")
 
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
 static Engine::UI::ImGuiInterface ui;
 
-static Engine::GraphicsDevice* sp_graphicsDevice;
+static Engine::GraphicsDevice *sp_graphicsDevice;
 static Engine::GPUBuffer cameraConstantBuffer;
 
-static Engine::Scene* pagodaScene;
+static Engine::Scene *pagodaScene;
 static DirectX::XMMATRIX perspectiveMatrix;
 
 void InitD3D(HWND hWnd);
@@ -47,9 +47,9 @@ void InitPipeline(void);
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 int WINAPI WinMain(HINSTANCE hInstance,
-							HINSTANCE hPrevInstance,
-							LPSTR lpCmdLine,
-							int nCmdShow)
+				   HINSTANCE hPrevInstance,
+				   LPSTR lpCmdLine,
+				   int nCmdShow)
 {
 	HWND hWnd;
 	WNDCLASSEX wc;
@@ -66,11 +66,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	RegisterClassEx(&wc);
 
-	RECT wr = { 0,0, SCREEN_WIDTH, SCREEN_HEIGHT };
+	RECT wr = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	AdjustWindowRect(&wr, WS_OVERLAPPEDWINDOW, FALSE);
 
 	hWnd = CreateWindowEx(
-		NULL, 
+		NULL,
 		L"WindowClass1",
 		L"First Windowed Program",
 		WS_OVERLAPPEDWINDOW,
@@ -81,8 +81,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		NULL,
 		NULL,
 		hInstance,
-		NULL
-	);
+		NULL);
 
 	ShowWindow(hWnd, nCmdShow);
 
@@ -91,12 +90,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	// Main Loop
 	MSG msg;
 
-	while (TRUE) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+	while (TRUE)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 
-			if (msg.message == WM_QUIT) {
+			if (msg.message == WM_QUIT)
+			{
 				break;
 			}
 		}
@@ -104,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		Update();
 		RenderFrame();
 	}
-	
+
 	CleanD3D();
 
 	return msg.wParam;
@@ -125,7 +127,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	{
 		PostQuitMessage(0);
 		return 0;
-	} break;
+	}
+	break;
 	}
 
 	return DefWindowProc(hWnd, message, wParam, lParam);
@@ -134,8 +137,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 void InitUI(HWND hWnd)
 {
 	ui.Init(hWnd, sp_graphicsDevice->pDevice, sp_graphicsDevice->pImmediateContext);
-	auto& cameraControlsState = ui.CameraState();
-	auto& objectControlsState = ui.ObjectState();
+	auto &cameraControlsState = ui.CameraState();
+	auto &objectControlsState = ui.ObjectState();
 	cameraControlsState.aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
 	cameraControlsState.fov = 0.785398f;
 	cameraControlsState.nearZ = 1.0f;
@@ -156,7 +159,6 @@ void InitD3D(HWND hWnd)
 	InitPipeline();
 }
 
-
 void CleanD3D()
 {
 	delete sp_graphicsDevice;
@@ -168,22 +170,22 @@ struct CameraConstantBuffer
 	DirectX::XMMATRIX view;
 	DirectX::XMMATRIX projection;
 	DirectX::XMFLOAT4 cameraPos;
+	DirectX::XMFLOAT4 lightPos;
 };
 
 void Update()
 {
-	auto objectControlsState = ui.ObjectState();
+	const auto &objectControlsState = ui.ObjectState();
 
-	Engine::Entity* mainPagoda = pagodaScene->GetEntity("Pagoda");
+	Engine::Entity *mainPagoda = pagodaScene->GetEntity("Pagoda");
 	mainPagoda->SetPosition(DirectX::XMFLOAT3(objectControlsState.x, objectControlsState.y, objectControlsState.z));
 	mainPagoda->SetRotation(DirectX::XMFLOAT3(objectControlsState.rotx, objectControlsState.roty, objectControlsState.rotz));
 
-	for (auto& entity : pagodaScene->GetEntities())
+	for (auto &entity : pagodaScene->GetEntities())
 	{
 		entity->Update();
 	}
 }
-
 
 void RenderFrame(void)
 {
@@ -193,16 +195,16 @@ void RenderFrame(void)
 	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRTV, ui.ObjectState().backgroundColor);
 
 	// Update constant buffer
-	auto cameraControlsState = ui.CameraState();
+	const auto &cameraControlsState = ui.CameraState();
+	const auto &sceneControlsState = ui.SceneState();
 	Engine::MappedGPUBuffer mappedCameraBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer);
 	{
 
-		CameraConstantBuffer* pBuffer = reinterpret_cast<CameraConstantBuffer*>(mappedCameraBuffer.data);
+		CameraConstantBuffer *pBuffer = reinterpret_cast<CameraConstantBuffer *>(mappedCameraBuffer.data);
 		pBuffer->view = DirectX::XMMatrixTranslation(
 			0.0f,
 			0.0f,
-			-20.0f
-		);
+			-20.0f);
 
 		pBuffer->view = DirectX::XMMatrixInverse(nullptr, pBuffer->view);
 		pBuffer->projection = DirectX::XMMatrixPerspectiveFovLH(
@@ -212,6 +214,11 @@ void RenderFrame(void)
 			cameraControlsState.farZ);
 
 		pBuffer->cameraPos = DirectX::XMFLOAT4(0.0f, 0.0f, -20.0f, 1.0f);
+		pBuffer->lightPos = DirectX::XMFLOAT4(
+			sceneControlsState.lightx,
+			sceneControlsState.lighty,
+			sceneControlsState.lightz,
+			1.0f);
 	}
 	Engine::UnmapConstantBuffer(*sp_graphicsDevice, mappedCameraBuffer);
 
@@ -219,19 +226,23 @@ void RenderFrame(void)
 
 	// Render entities
 	auto entities = pagodaScene->GetEntities();
-	for (auto& entity : entities)
+	for (auto &entity : entities)
 	{
-		Engine::GPUBuffer& entityGPUBuffer = entity->GetMaterial()->GetGPUBuffer();
-		Engine::MappedGPUBuffer entityConstantBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, entityGPUBuffer);
+		Engine::GPUBuffer* entityGPUBuffer = entity->GetMaterial()->GetGPUBuffer();
+		if (entityGPUBuffer->pNativeBuffer)
 		{
-			Engine::PerspectiveConstantBuffer* pBuffer = reinterpret_cast<Engine::PerspectiveConstantBuffer*>(entityConstantBuffer.data);
-			pBuffer->worldTransform = entity->GetTransform();
-		}
-		Engine::UnmapConstantBuffer(*sp_graphicsDevice, entityConstantBuffer);
+			Engine::MappedGPUBuffer entityConstantBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, *entityGPUBuffer);
+			{
+				Engine::PerspectiveConstantBuffer* pBuffer = reinterpret_cast<Engine::PerspectiveConstantBuffer*>(entityConstantBuffer.data);
+				pBuffer->worldTransform = entity->GetTransform();
+			}
+			Engine::UnmapConstantBuffer(*sp_graphicsDevice, entityConstantBuffer);
 
-		Engine::BindConstantBuffer(*sp_graphicsDevice, entityGPUBuffer, 1);
+			Engine::BindConstantBuffer(*sp_graphicsDevice, *entityGPUBuffer, 1);
+		}
 		entity->Bind(*sp_graphicsDevice);
-		sp_graphicsDevice->pImmediateContext->Draw(entity->GetMesh()->NumberVertices(), 0);
+		Engine::Mesh* mesh = entity->GetMesh();
+		sp_graphicsDevice->pImmediateContext->Draw(mesh ? mesh->NumberVertices() : 4, 0);
 	}
 
 	// Render UI last to draw on top of scene
@@ -245,7 +256,7 @@ void InitPipeline(void)
 {
 	pagodaScene = new Game::PagodaScene();
 	pagodaScene->Load(*sp_graphicsDevice);
-	 
+
 	//perspectiveConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(Engine::PerspectiveConstantBuffer));
 	cameraConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(CameraConstantBuffer), nullptr);
 }

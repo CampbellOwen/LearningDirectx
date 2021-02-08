@@ -32,7 +32,7 @@ namespace Engine
 
 		void AddGPUBuffer(const GraphicsDevice& device, void* buffer, size_t numBytes);
 		void AddGPUBuffer(const GraphicsDevice& device, size_t numBytes);
-		GPUBuffer& GetGPUBuffer();
+		GPUBuffer* GetGPUBuffer();
 
 
 	private:

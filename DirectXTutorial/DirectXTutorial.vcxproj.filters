@@ -66,6 +66,9 @@
     <ClCompile Include="PagodaScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Material.h">
@@ -137,9 +140,13 @@
     <ClInclude Include="PagodaScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders.hlsl" />
+    <FxCompile Include="light.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
