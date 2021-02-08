@@ -5,9 +5,9 @@ SamplerState SampleType;
 struct VOut
 {
 	float4 position : SV_POSITION0;
+	float3 worldPos : POSITION;
 	float3 normal : NORMAL;
 	float2 texCoord: TEXCOORD;
-	float3 lightPos : POSITION1;
 };
 
 cbuffer CameraConstants : register(b0)
@@ -15,6 +15,7 @@ cbuffer CameraConstants : register(b0)
 	float4x4 camera;
 	float4x4 projection;
 	float4 cameraPos;
+	float4 lightPos;
 }
 cbuffer ModelConstants : register(b1)
 {
@@ -44,20 +45,33 @@ VOut VShader(VertexInputType input)
 
 
 	output.position = clipSpace;
+	output.worldPos = worldSpace.xyz;
 	output.normal = normal;
 	output.texCoord = input.texCoord;
-	float4 lightPositionWorld = worldSpace - float4(0.0f, 0.0f, -15.0f, 1.0f);
-	output.lightPos = normalize(lightPositionWorld.xyz);
 
 	return output;
 }
 
 float4 PShader(VOut input) : SV_TARGET
 {
+	float4 textureSample = shaderTexture.Sample(SampleType, input.texCoord);
 	
-	float kd = clamp(dot(input.lightPos, input.normal), 0.0, 1.0);
+	float3 lightDir = input.worldPos - lightPos.xyz;
+	float distance = length(lightDir);
+	lightDir = lightDir / distance;
 
-	return shaderTexture.Sample(SampleType, input.texCoord) * kd;
-	//float4 normalColor = { input.normal, 1 };
-	//return normalColor;
+	float distance_2 = distance * distance;
+
+
+	float NdotL = dot(input.normal, lightDir);
+	float diffuse_intensity = saturate(NdotL);
+
+	float kd = diffuse_intensity;
+	float4 ka = float4(0.1f, 0.1f, 0.1f, 1.0f);
+
+
+	float4 diffuse = textureSample * kd;
+	float4 ambient = textureSample * ka;
+
+	return diffuse;
 }
