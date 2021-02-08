@@ -38,6 +38,15 @@ struct CameraControls : Controls
 	void Render() override;
 };
 
+struct SceneControls : Controls
+{
+	float lightx;
+	float lighty;
+	float lightz;
+
+	void Render() override;
+};
+
 class ImGuiInterface : Interface
 {
 public:
@@ -48,10 +57,12 @@ public:
 
 	ObjectControls& ObjectState();
 	CameraControls& CameraState();
+	SceneControls& SceneState();
 
 private:
 	ObjectControls m_ObjectControls;
 	CameraControls m_CameraControls;
+	SceneControls m_SceneControls;
 };
 
 } // namespace UI

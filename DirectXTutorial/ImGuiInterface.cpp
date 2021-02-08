@@ -40,6 +40,18 @@ void ObjectControls::Render()
 	ImGui::End();
 }
 
+void SceneControls::Render()
+{
+	ImGui::Begin("Scene Controls");
+
+	ImGui::Text("Light Position");
+	ImGui::SliderFloat("X", &lightx, -30.0f, 30.0f);
+	ImGui::SliderFloat("Y", &lighty, -30.0f, 30.0f);
+	ImGui::SliderFloat("Z", &lightz, -30.0f, 30.0f);
+
+	ImGui::End();
+}
+
 void ImGuiInterface::Init(HWND hWnd, ID3D11Device* dev, ID3D11DeviceContext* devCon)
 {
 	// Setup Dear ImGui context
@@ -71,6 +83,7 @@ void ImGuiInterface::Render()
 
 	m_CameraControls.Render();
 	m_ObjectControls.Render();
+	m_SceneControls.Render();
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -84,6 +97,11 @@ CameraControls& ImGuiInterface::CameraState()
 ObjectControls& ImGuiInterface::ObjectState()
 {
 	return m_ObjectControls;
+}
+
+SceneControls& ImGuiInterface::SceneState()
+{
+	return m_SceneControls;
 }
 
 } // namespace UI
