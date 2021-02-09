@@ -47,7 +47,7 @@ void SceneControls::Render()
 	ImGui::Text("Light Position");
 	ImGui::SliderFloat("X", &lightx, -30.0f, 30.0f);
 	ImGui::SliderFloat("Y", &lighty, -30.0f, 30.0f);
-	ImGui::SliderFloat("Z", &lightz, -30.0f, 30.0f);
+	ImGui::SliderFloat("Z", &lightz, -30.0f, 100.0f);
 
 	ImGui::End();
 }

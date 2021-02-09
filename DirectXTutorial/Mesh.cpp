@@ -47,7 +47,12 @@ namespace Engine
 		UINT offset = 0;
 
 		deviceContext->IASetVertexBuffers(0, 1, &m_pVBuffer, &stride, &offset);
-		deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		deviceContext->IASetPrimitiveTopology(m_topology);
+	}
+
+	void Mesh::SetTopology(D3D_PRIMITIVE_TOPOLOGY topology)
+	{
+		m_topology = topology;
 	}
 
 	uint32_t Mesh::NumberVertices() {

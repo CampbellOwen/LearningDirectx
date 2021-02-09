@@ -10,7 +10,6 @@ class LightMaterial final : public Material
 {
 public:
 	bool Init(const GraphicsDevice& device);
-	void Activate(const GraphicsDevice& device);
 };
 
 } // namespace Engine

@@ -228,6 +228,11 @@ void RenderFrame(void)
 	auto entities = pagodaScene->GetEntities();
 	for (auto &entity : entities)
 	{
+		Engine::Mesh* mesh = entity->GetMesh();
+		if (!mesh) {
+			continue;
+		}
+
 		Engine::GPUBuffer* entityGPUBuffer = entity->GetMaterial()->GetGPUBuffer();
 		if (entityGPUBuffer->pNativeBuffer)
 		{
@@ -241,8 +246,7 @@ void RenderFrame(void)
 			Engine::BindConstantBuffer(*sp_graphicsDevice, *entityGPUBuffer, 1);
 		}
 		entity->Bind(*sp_graphicsDevice);
-		Engine::Mesh* mesh = entity->GetMesh();
-		sp_graphicsDevice->pImmediateContext->Draw(mesh ? mesh->NumberVertices() : 4, 0);
+		sp_graphicsDevice->pImmediateContext->Draw(mesh->NumberVertices(), 0);
 	}
 
 	// Render UI last to draw on top of scene

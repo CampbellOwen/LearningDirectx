@@ -17,11 +17,4 @@ bool LightMaterial::Init(const GraphicsDevice& device)
 
 	return true;
 }
-
-void LightMaterial::Activate(const GraphicsDevice& device)
-{
-	device.pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	Material::Activate(device);
-}
-
-}
+} // namespace Engine

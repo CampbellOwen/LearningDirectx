@@ -26,11 +26,14 @@ namespace Engine
 		void Destroy(void);
 		
 		void Activate(ID3D11DeviceContext* deviceContext);
-		uint32_t NumberVertices(void);
-		
+		void SetTopology(D3D_PRIMITIVE_TOPOLOGY topology);
+		virtual size_t NumberVertices(void);
+
 	private:
 		ID3D11Buffer* m_pVBuffer = nullptr;
-		uint32_t m_numVertices = 0;
+		D3D_PRIMITIVE_TOPOLOGY m_topology{ D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST };
+	protected:
+		size_t m_numVertices = 0;
 	};
 
 }

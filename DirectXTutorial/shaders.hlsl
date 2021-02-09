@@ -39,7 +39,7 @@ VOut VShader(VertexInputType input)
 	float4 cameraSpace = mul(camera, worldSpace);
 	float4 clipSpace = mul(projection, cameraSpace);
 
-	float4 normal4 = { input.normal, 1 };
+	float4 normal4 = { input.normal, 0 };
 	float4 worldNormal = mul(world, normal4);
 
 	float3 normal = normalize(worldNormal.xyz);
@@ -57,22 +57,21 @@ float4 PShader(VOut input) : SV_TARGET
 {
 	float4 textureSample = shaderTexture.Sample(SampleType, input.texCoord);
 	
-	float3 lightDir = input.worldPos - lightPos.xyz;
+	float3 lightDir = lightPos.xyz - input.worldPos;
 	float distance = length(lightDir);
 	lightDir = lightDir / distance;
 
 	float distance_2 = distance * distance;
 
-
 	float NdotL = dot(input.normal, lightDir);
 	float diffuse_intensity = saturate(NdotL);
 
-	float kd = diffuse_intensity;
+	float kd = diffuse_intensity / (distance / 10);
 	float4 ka = float4(0.1f, 0.1f, 0.1f, 1.0f);
 
 
 	float4 diffuse = textureSample * kd;
 	float4 ambient = textureSample * ka;
 
-	return diffuse;
+	return ambient + diffuse;
 }
