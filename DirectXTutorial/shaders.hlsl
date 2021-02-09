@@ -62,8 +62,11 @@ float4 PShader(VOut input) : SV_TARGET
 	lightDir = lightDir / distance;
 
 	float distance_2 = distance * distance;
-
 	float NdotL = dot(input.normal, lightDir);
+
+	float3 reflected = normalize((2 * NdotL * input.normal) - lightDir);
+	float3 view = normalize(cameraPos.xyz - input.worldPos);
+
 	float diffuse_intensity = saturate(NdotL);
 
 	float kd = diffuse_intensity / (distance / 10);
@@ -72,6 +75,12 @@ float4 PShader(VOut input) : SV_TARGET
 
 	float4 diffuse = textureSample * kd;
 	float4 ambient = textureSample * ka;
+	float4 specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	return ambient + diffuse;
+	if (NdotL > 0)
+	{
+		specular = 0.5f * pow(saturate(dot(reflected, view)), 0.1f) * textureSample;
+	}
+
+	return ambient + diffuse + specular;
 }
