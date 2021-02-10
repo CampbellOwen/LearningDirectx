@@ -83,7 +83,7 @@ float4 PShader(VOut input) : SV_TARGET
 	float3 half_vector = normalize(lightDir + view);
 	
 	//float specular_constant = 0.1f;
-	float specular_constant = metallicTexture.Sample(SampleType, input.texCoord);
+	float specular_constant = clamp(1.0f - metallicTexture.Sample(SampleType, input.texCoord), 0.01f, 1.0f);
 
 	specular = (textureSample * NdotL) *
 		pow(saturate(dot(reflected, view)), specular_constant) *
