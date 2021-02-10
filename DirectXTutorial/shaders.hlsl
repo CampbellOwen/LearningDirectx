@@ -1,5 +1,7 @@
 
-Texture2D shaderTexture;
+Texture2D diffuseTexture : register (t0);
+Texture2D aoTexture : register (t1);
+Texture2D metallicTexture : register (t2);
 SamplerState SampleType;
 
 struct VOut
@@ -39,6 +41,7 @@ VOut VShader(VertexInputType input)
 	float4 cameraSpace = mul(camera, worldSpace);
 	float4 clipSpace = mul(projection, cameraSpace);
 
+	// set w to 0 to cancel out translation aspect of world transform
 	float4 normal4 = { input.normal, 0 };
 	float4 worldNormal = mul(world, normal4);
 
@@ -57,7 +60,8 @@ static const float PI = 3.14159265f;
 
 float4 PShader(VOut input) : SV_TARGET
 {
-	float4 textureSample = shaderTexture.Sample(SampleType, input.texCoord);
+	float4 textureSample = diffuseTexture.Sample(SampleType, input.texCoord);
+	float4 aoSample = aoTexture.Sample(SampleType, input.texCoord);
 	
 	float3 lightDir = lightPos.xyz - input.worldPos;
 	float distance = length(lightDir);
@@ -78,11 +82,12 @@ float4 PShader(VOut input) : SV_TARGET
 
 	float3 half_vector = normalize(lightDir + view);
 	
-	float specular_constant = 0.1f;
+	//float specular_constant = 0.1f;
+	float specular_constant = metallicTexture.Sample(SampleType, input.texCoord);
 
 	specular = (textureSample * NdotL) *
 		pow(saturate(dot(reflected, view)), specular_constant) *
 		((specular_constant + 8.0f) / (8.0f * PI));
 
-	return ambient + diffuse + specular;
+	return ambient + (aoSample * (diffuse + specular));
 }

@@ -20,8 +20,16 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 	Engine::Texture* pagodaTexture = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\albedo.png");
 	m_textures.emplace("Pagoda_Albedo", pagodaTexture);
 
+	Engine::Texture* pagodaAO = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\ao.png");
+	m_textures.emplace("Pagoda_AO", pagodaAO);
+
+	Engine::Texture* pagodaMetallic = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\metallic.png");
+	m_textures.emplace("Pagoda_Metallic", pagodaMetallic);
+
 	Engine::PerspectiveMaterial* pagodaMaterial = new Engine::PerspectiveMaterial();
 	pagodaMaterial->AddTexture(pagodaTexture);
+	pagodaMaterial->AddTexture(pagodaAO);
+	pagodaMaterial->AddTexture(pagodaMetallic);
 	pagodaMaterial->Init(device);
 
 	m_materials.emplace("Perspective", pagodaMaterial);
