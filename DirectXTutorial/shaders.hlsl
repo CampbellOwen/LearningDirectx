@@ -53,6 +53,8 @@ VOut VShader(VertexInputType input)
 	return output;
 }
 
+static const float PI = 3.14159265f;
+
 float4 PShader(VOut input) : SV_TARGET
 {
 	float4 textureSample = shaderTexture.Sample(SampleType, input.texCoord);
@@ -61,26 +63,26 @@ float4 PShader(VOut input) : SV_TARGET
 	float distance = length(lightDir);
 	lightDir = lightDir / distance;
 
-	float distance_2 = distance * distance;
 	float NdotL = dot(input.normal, lightDir);
+
+	float diffuse_intensity = saturate(NdotL);
+	float kd = diffuse_intensity / (distance / 10);
+	float4 diffuse = textureSample * kd;
 
 	float3 reflected = normalize((2 * NdotL * input.normal) - lightDir);
 	float3 view = normalize(cameraPos.xyz - input.worldPos);
 
-	float diffuse_intensity = saturate(NdotL);
-
-	float kd = diffuse_intensity / (distance / 10);
 	float4 ka = float4(0.1f, 0.1f, 0.1f, 1.0f);
-
-
-	float4 diffuse = textureSample * kd;
 	float4 ambient = textureSample * ka;
 	float4 specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	if (NdotL > 0)
-	{
-		specular = 0.5f * pow(saturate(dot(reflected, view)), 0.1f) * textureSample;
-	}
+	float3 half_vector = normalize(lightDir + view);
+	
+	float specular_constant = 0.1f;
+
+	specular = (textureSample * NdotL) *
+		pow(saturate(dot(reflected, view)), specular_constant) *
+		((specular_constant + 8.0f) / (8.0f * PI));
 
 	return ambient + diffuse + specular;
 }
