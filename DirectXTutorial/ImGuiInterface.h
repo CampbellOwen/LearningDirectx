@@ -23,8 +23,7 @@ struct ObjectControls : Controls
 	float roty;
 	float rotz;
 
-	// Default cornflower blue :)
-	float backgroundColor[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	float backgroundColor[4] = { 0.122f, 0.133f, 0.149f, 1.0f };
 
 	void Render() override;
 };
@@ -39,6 +38,15 @@ struct CameraControls : Controls
 	void Render() override;
 };
 
+struct SceneControls : Controls
+{
+	float lightx;
+	float lighty;
+	float lightz;
+
+	void Render() override;
+};
+
 class ImGuiInterface : Interface
 {
 public:
@@ -49,10 +57,12 @@ public:
 
 	ObjectControls& ObjectState();
 	CameraControls& CameraState();
+	SceneControls& SceneState();
 
 private:
 	ObjectControls m_ObjectControls;
 	CameraControls m_CameraControls;
+	SceneControls m_SceneControls;
 };
 
 } // namespace UI

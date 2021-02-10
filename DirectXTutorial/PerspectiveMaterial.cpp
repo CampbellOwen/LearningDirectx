@@ -5,32 +5,42 @@
 namespace Engine
 {
 
-bool PerspectiveMaterial::Init(
-	ID3D11Device* device,
-	const ShaderInfo& vertexShader,
-	const ShaderInfo& pixelShader,
-	const D3D11_INPUT_ELEMENT_DESC* inputDesc,
-	uint32_t numInputs)
+bool PerspectiveMaterial::Init(const GraphicsDevice& device)
 {
-	const bool result = Material::Init(device, vertexShader, pixelShader, inputDesc, numInputs);
+	D3D11_INPUT_ELEMENT_DESC ied[] = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	};
+	const Engine::ShaderInfo vertexShader{L"shaders.hlsl", "VShader"};
+	const Engine::ShaderInfo pixelShader{ L"shaders.hlsl", "PShader" };
+
+	const bool result = Material::Init(device, vertexShader, pixelShader, ied, 4);
 	if (!result) {
 		return false;
 	}
 
-	D3D11_BUFFER_DESC cbDesc;
-	ZeroMemory(&cbDesc, sizeof(cbDesc));
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
 
-	cbDesc.ByteWidth = sizeof(PerspectiveConstantBuffer);
-	cbDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	HRESULT hr = device->CreateBuffer(&cbDesc, nullptr, &m_pConstantBuffer);
+	HRESULT hr = device.pDevice->CreateSamplerState(&samplerDesc, &m_pSamplerState);
 	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "CreateConstantBuffer", MB_OK);
-		Destroy();
-		return false; 
+		MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Sampler State", MB_OK);
+		return false;
 	}
+
+	Material::AddSampler(m_pSamplerState);
+
+	AddGPUBuffer(device, sizeof(PerspectiveConstantBuffer));
 
 	return true;
 }
@@ -39,71 +49,16 @@ void PerspectiveMaterial::Destroy()
 {
 	Material::Destroy();
 
-	if (m_pConstantBuffer) {
-		m_pConstantBuffer->Release();
-	}
-	if (m_pTextureView) {
-		m_pTextureView->Release();
-	}
-}
-
-bool PerspectiveMaterial::UpdateConstantBuffer(ID3D11DeviceContext* deviceContext, const PerspectiveConstantBuffer& buffer)
-{
-	D3D11_MAPPED_SUBRESOURCE resource;
-	ZeroMemory(&resource, sizeof(resource));
-
-	HRESULT hr = deviceContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "Map constant buffer", MB_OK);
-		return false;
-	}
-
-	memcpy(resource.pData, &buffer, sizeof(PerspectiveConstantBuffer));
-
-	deviceContext->Unmap(m_pConstantBuffer, 0);
-
-	return true;
-}
-
-void PerspectiveMaterial::Activate(ID3D11DeviceContext* deviceContext)
-{
-	Material::Activate(deviceContext);
-
-	deviceContext->VSSetConstantBuffers(0, 1, &m_pConstantBuffer);
-	if (m_pTextureView) {
-		deviceContext->PSSetShaderResources(0, 1, &m_pTextureView);
-	}
-	if (m_pSamplerState) {
-		deviceContext->PSSetSamplers(0, 1, &m_pSamplerState);
+	if (m_pSamplerState)
+	{
+		m_pSamplerState->Release();
+		m_pSamplerState = nullptr;
 	}
 }
 
-bool PerspectiveMaterial::AddTexture(ID3D11Device* device, ID3D11Resource* texture)
+void PerspectiveMaterial::Activate(const GraphicsDevice& device)
 {
-	HRESULT hr = device->CreateShaderResourceView(texture, nullptr, &m_pTextureView);
-	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "Create Shader Resource View", MB_OK);
-		return false;
-	}
-
-	D3D11_SAMPLER_DESC samplerDesc;
-	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	hr = device->CreateSamplerState(&samplerDesc, &m_pSamplerState);
-	if (FAILED(hr)) {
-		MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "Create Sampler State", MB_OK);
-		return false;
-	}
-
-	return true;
+	Material::Activate(device);
 }
 
 } // namespace Engine

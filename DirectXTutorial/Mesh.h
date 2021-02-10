@@ -1,10 +1,9 @@
 #pragma once
 #include <string>
 #include <DirectXMath.h>
-#include <d3d11.h>
-
 #include <vector>
 
+#include "GraphicsDevice.h"
 
 namespace Engine
 {
@@ -23,15 +22,18 @@ namespace Engine
 		~Mesh(void);
 
 		//bool Init(const ID3D11Device* device, const ID3D11DeviceContext* deviceContext, const std::string& filename);
-		bool Init(ID3D11Device* device, const ID3D11DeviceContext* deviceContext, const std::vector<VERTEX>& vertices);
+		bool Init(const GraphicsDevice& device, const std::vector<VERTEX>& vertices);
 		void Destroy(void);
 		
 		void Activate(ID3D11DeviceContext* deviceContext);
-		uint32_t NumberVertices(void);
+		void SetTopology(D3D_PRIMITIVE_TOPOLOGY topology);
+		virtual size_t NumberVertices(void);
 
 	private:
 		ID3D11Buffer* m_pVBuffer = nullptr;
-		uint32_t m_numVertices = 0;
+		D3D_PRIMITIVE_TOPOLOGY m_topology{ D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST };
+	protected:
+		size_t m_numVertices = 0;
 	};
 
 }

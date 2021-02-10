@@ -29,6 +29,19 @@ void Entity::SetMesh(Mesh* mesh)
 	 m_pMesh = mesh;
 }
 
+void Entity::UpdateTransform()
+{
+	DirectX::XMVECTOR vec = DirectX::XMLoadFloat3(&m_rotation);
+	m_transform = DirectX::XMMatrixRotationRollPitchYawFromVector(vec);
+
+	vec = DirectX::XMLoadFloat3(&m_scale);
+	m_transform *= DirectX::XMMatrixScalingFromVector(vec);
+
+	vec = DirectX::XMLoadFloat3(&m_position);
+	m_transform *= DirectX::XMMatrixTranslationFromVector(vec);
+
+}
+
 ///////////////////
 // Position Setters
 ///////////////////
@@ -47,6 +60,7 @@ void Entity::SetPosition(Axis axis, float magnitude)
 				m_position.z = magnitude;
 				break;
 	 }
+	 UpdateTransform();
 }
 
 void Entity::MovePosition(Axis axis, float magnitude)
@@ -63,11 +77,13 @@ void Entity::MovePosition(Axis axis, float magnitude)
 				m_position.z = m_position.z + magnitude;
 				break;
 	 }
+	 UpdateTransform();
 }
 
 void Entity::SetPosition(DirectX::XMFLOAT3 position)
 {
 	 m_position = position;
+	 UpdateTransform();
 }
 
 void Entity::MovePosition(DirectX::XMFLOAT3 position)
@@ -77,6 +93,7 @@ void Entity::MovePosition(DirectX::XMFLOAT3 position)
 		  DirectX::XMLoadFloat3(&position));
 
 	 DirectX::XMStoreFloat3(&m_position, vec);
+	 UpdateTransform();
 }
 
 ///////////////////
@@ -97,6 +114,7 @@ void Entity::SetRotation(Axis axis, float radians)
 				m_rotation.z = radians;
 				break;
 	 }
+	 UpdateTransform();
 }
 
 void Entity::ApplyRotation(Axis axis, float radians)
@@ -113,11 +131,13 @@ void Entity::ApplyRotation(Axis axis, float radians)
 				m_rotation.z = m_rotation.z + radians;
 				break;
 	 }
+	 UpdateTransform();
 }
 
 void Entity::SetRotation(DirectX::XMFLOAT3 rotation)
 {
 	 m_rotation = rotation;
+	 UpdateTransform();
 }
 
 void Entity::ApplyRotation(DirectX::XMFLOAT3 rotation)
@@ -127,6 +147,7 @@ void Entity::ApplyRotation(DirectX::XMFLOAT3 rotation)
 		  DirectX::XMLoadFloat3(&rotation));
 
 	 DirectX::XMStoreFloat3(&m_rotation, vec);
+	 UpdateTransform();
 }
 
 ////////////////
@@ -146,6 +167,7 @@ void Entity::SetScale(Axis axis, float magnitude)
 				m_scale.z = magnitude;
 				break;
 	 }
+	 UpdateTransform();
 }
 
 void Entity::ApplyScale(Axis axis, float magnitude)
@@ -162,11 +184,13 @@ void Entity::ApplyScale(Axis axis, float magnitude)
 				m_scale.z = m_scale.z + magnitude;
 				break;
 	 }
+	 UpdateTransform();
 }
 
 void Entity::SetScale(DirectX::XMFLOAT3 scale)
 {
 	 m_scale = scale;
+	 UpdateTransform();
 }
 
 
@@ -177,6 +201,20 @@ void Entity::ApplyScale(DirectX::XMFLOAT3 scale)
 		  DirectX::XMLoadFloat3(&scale));
 
 	 DirectX::XMStoreFloat3(&m_scale, vec);
+	 UpdateTransform();
+}
+
+void Entity::Bind(const GraphicsDevice& device)
+{
+	if (m_pMesh)
+	{
+		m_pMesh->Activate(device.pImmediateContext);
+	}
+
+	if (m_pMaterial)
+	{
+		m_pMaterial->Activate(device);
+	}
 }
 
 } // namespace Engine

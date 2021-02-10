@@ -14,9 +14,8 @@ namespace Loaders
 	std::vector<Engine::VERTEX> LoadObj(const std::string& filename);
 	HRESULT LoadImage(
 		ID3D11Device* device, 
-		ID3D11DeviceContext* deviceContext, 
 		LPCWSTR filename, 
-		ID3D11Resource** texture
+		ID3D11Texture2D** texture
 	);
 
 } // namespace Loaders

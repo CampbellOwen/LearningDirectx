@@ -12,8 +12,8 @@ void CameraControls::Render()
 {
 	ImGui::Begin("Camera Controls");
 	ImGui::SliderFloat("FOV", &fov, 0.1f, M_PI);
-	ImGui::SliderFloat("Aspect Ratio", &aspectRatio, -30.0f, 30.0f);
-	ImGui::SliderFloat("Near Z", &nearZ, 0, 10.0f);
+	ImGui::SliderFloat("Aspect Ratio", &aspectRatio, 0.0f, 3.0f);
+	ImGui::SliderFloat("Near Z", &nearZ, 0.001f, 10.0f);
 	ImGui::SliderFloat("Far Z", &farZ, 0, 100.0f);
 	ImGui::End();
 }
@@ -37,6 +37,18 @@ void ObjectControls::Render()
 	ImGui::ColorEdit3("clear color", (float*)&backgroundColor);
 
 	ImGui::Text("%.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	ImGui::End();
+}
+
+void SceneControls::Render()
+{
+	ImGui::Begin("Scene Controls");
+
+	ImGui::Text("Light Position");
+	ImGui::SliderFloat("X", &lightx, -30.0f, 30.0f);
+	ImGui::SliderFloat("Y", &lighty, -30.0f, 30.0f);
+	ImGui::SliderFloat("Z", &lightz, -30.0f, 100.0f);
+
 	ImGui::End();
 }
 
@@ -71,6 +83,7 @@ void ImGuiInterface::Render()
 
 	m_CameraControls.Render();
 	m_ObjectControls.Render();
+	m_SceneControls.Render();
 
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -84,6 +97,11 @@ CameraControls& ImGuiInterface::CameraState()
 ObjectControls& ImGuiInterface::ObjectState()
 {
 	return m_ObjectControls;
+}
+
+SceneControls& ImGuiInterface::SceneState()
+{
+	return m_SceneControls;
 }
 
 } // namespace UI
