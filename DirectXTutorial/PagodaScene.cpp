@@ -17,13 +17,16 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 	m_meshes.emplace("Pagoda", pagodaMesh);
 
-	Engine::Texture* pagodaTexture = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\albedo.png");
+	Engine::Texture* pagodaTexture = new Engine::Texture(); 
+	pagodaTexture->InitFromFile(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\albedo.png");
 	m_textures.emplace("Pagoda_Albedo", pagodaTexture);
 
-	Engine::Texture* pagodaAO = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\ao.png");
+	Engine::Texture* pagodaAO = new Engine::Texture();
+	pagodaAO->InitFromFile(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\ao.png");
 	m_textures.emplace("Pagoda_AO", pagodaAO);
 
-	Engine::Texture* pagodaMetallic = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\metallic.png");
+	Engine::Texture* pagodaMetallic = new Engine::Texture();
+	pagodaMetallic->InitFromFile(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\metallic.png");
 	m_textures.emplace("Pagoda_Metallic", pagodaMetallic);
 
 	Engine::ThreeTextureMaterial* pagodaMaterial = new Engine::ThreeTextureMaterial();
@@ -90,7 +93,8 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 		floorMesh->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_meshes.emplace("Floor", floorMesh);
 
-		Engine::Texture* floorTexture = new Engine::Texture(device.pDevice, L"F:\\Textures\\Final.png");
+		Engine::Texture* floorTexture = new Engine::Texture();
+		floorTexture->InitFromFile(device.pDevice, L"F:\\Textures\\Final.png");
 		m_textures.emplace("Floor", floorTexture);
 
 		Engine::ThreeTextureMaterial* floorMaterial = new Engine::ThreeTextureMaterial();

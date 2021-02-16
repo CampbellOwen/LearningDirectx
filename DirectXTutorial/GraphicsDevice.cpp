@@ -153,6 +153,16 @@ namespace Engine
 		return m_pCurrContext;
 	}
 
+	ID3D11DeviceContext* GraphicsDevice::DeferredContext() const noexcept
+	{
+		return m_pDeferredContext;
+	}
+
+	ID3D11DeviceContext* GraphicsDevice::ImmediateContext() const noexcept
+	{
+		return m_pImmediateContext;
+	}
+
 	void GraphicsDevice::UseImmediateContext() noexcept
 	{
 		m_pCurrContext = m_pImmediateContext;

@@ -22,6 +22,8 @@ struct GraphicsDevice
 	GraphicsDevice(HWND hWnd, uint32_t width, uint32_t height);
 	~GraphicsDevice();
 	ID3D11DeviceContext* Context() const noexcept;
+	ID3D11DeviceContext* ImmediateContext() const noexcept;
+	ID3D11DeviceContext* DeferredContext() const noexcept;
 	void UseImmediateContext() noexcept;
 	void UseDeferredContext() noexcept;
 

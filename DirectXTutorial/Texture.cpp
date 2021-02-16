@@ -6,7 +6,7 @@
 namespace Engine 
 {
 
-Texture::Texture(ID3D11Device* device, LPCWSTR filename)
+void Texture::InitFromFile(ID3D11Device* device, LPCWSTR filename)
 {
 	pNativeTexture = nullptr;
 	HRESULT hr = Loaders::LoadImageW(device, filename, &pNativeTexture);

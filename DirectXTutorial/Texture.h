@@ -7,11 +7,11 @@ namespace Engine
 
 struct Texture
 {
-	Texture(ID3D11Device* device, LPCWSTR filename);
+	void InitFromFile(ID3D11Device* device, LPCWSTR filename);
 	~Texture();
 
-	ID3D11Texture2D* pNativeTexture;
-	ID3D11ShaderResourceView* pResourceView;
+	ID3D11Texture2D* pNativeTexture { nullptr };
+	ID3D11ShaderResourceView* pResourceView { nullptr };
 };
 
 } // namespace Engine
