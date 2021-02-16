@@ -5,10 +5,12 @@
 #include <vector>
 
 #include "GraphicsDevice.h"
+#include "Sampler.h"
 #include "Texture.h"
 
 namespace Engine
 {
+	class Entity;
 	struct ShaderInfo
 	{
 		LPCWSTR filename;
@@ -26,21 +28,27 @@ namespace Engine
 			uint32_t numInputs );
 		virtual void Destroy();
 
-		virtual void Activate(const GraphicsDevice& device);
-		void AddSampler(ID3D11SamplerState* samplerState);
+		virtual void Activate(const GraphicsDevice& device, uint32_t shaderResourceStartSlot = 0, uint32_t samplerStartSlot = 0);
+		void AddSampler(Sampler* sampler);
 		void AddTexture(Texture* texture);
 
 		void AddGPUBuffer(const GraphicsDevice& device, void* buffer, size_t numBytes);
 		void AddGPUBuffer(const GraphicsDevice& device, size_t numBytes);
 		GPUBuffer* GetGPUBuffer();
 
+		virtual void UpdateConstantBuffer(const GraphicsDevice& device, const Entity& entity) 
+		{ 
 
+		}
+
+
+	protected:
+		GPUBuffer m_gpuBuffer;
 	private:
 		ID3D11VertexShader* m_pVertexShader;
 		ID3D11PixelShader* m_pPixelShader;
 		ID3D11InputLayout* m_pLayout;
 		std::vector<Texture*> m_textures;
-		std::vector<ID3D11SamplerState*> m_samplerStates;
-		GPUBuffer m_gpuBuffer;
+		std::vector<Sampler*> m_samplers;
 	};
 }

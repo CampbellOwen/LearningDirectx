@@ -18,7 +18,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "PagodaScene.h"
-#include "PerspectiveMaterial.h"
+#include "ThreeTextureMaterial.h"
 #include "Scene.h"
 #include "Utils.h"
 
@@ -233,18 +233,6 @@ void RenderFrame(void)
 			continue;
 		}
 
-		Engine::GPUBuffer* entityGPUBuffer = entity->GetMaterial()->GetGPUBuffer();
-		if (entityGPUBuffer->pNativeBuffer)
-		{
-			Engine::MappedGPUBuffer entityConstantBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, *entityGPUBuffer);
-			{
-				Engine::PerspectiveConstantBuffer* pBuffer = reinterpret_cast<Engine::PerspectiveConstantBuffer*>(entityConstantBuffer.data);
-				pBuffer->worldTransform = entity->GetTransform();
-			}
-			Engine::UnmapConstantBuffer(*sp_graphicsDevice, entityConstantBuffer);
-
-			Engine::BindConstantBuffer(*sp_graphicsDevice, *entityGPUBuffer, 1);
-		}
 		entity->Bind(*sp_graphicsDevice);
 		sp_graphicsDevice->pImmediateContext->Draw(mesh->NumberVertices(), 0);
 	}

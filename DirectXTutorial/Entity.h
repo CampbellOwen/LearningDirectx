@@ -63,13 +63,13 @@ public:
 	    return m_parent;
 	}
 
-	DirectX::XMMATRIX GetTransform()
-	{
-	    return m_transform;
-	}
-
 	virtual void Update()
 	{
+	}
+
+	DirectX::XMMATRIX GetTransform() const
+	{
+	    return m_transform;
 	}
 
 	void Bind(const GraphicsDevice& device);

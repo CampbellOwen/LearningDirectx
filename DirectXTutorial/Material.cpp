@@ -99,7 +99,7 @@ namespace Engine
 		return true;
 	}
 
-	void Material::Activate(const GraphicsDevice &device)
+	void Material::Activate(const GraphicsDevice &device, uint32_t shaderResourceStartSlot, uint32_t samplerStartSlot)
 	{
 		device.pImmediateContext->VSSetShader(m_pVertexShader, 0, 0);
 		device.pImmediateContext->PSSetShader(m_pPixelShader, 0, 0);
@@ -110,13 +110,20 @@ namespace Engine
 		{
 			textureViews.push_back(texture->pResourceView);
 		}
-		device.pImmediateContext->PSSetShaderResources(0, textureViews.size(), textureViews.data());
-		device.pImmediateContext->PSSetSamplers(0, m_samplerStates.size(), m_samplerStates.data());
+		device.pImmediateContext->PSSetShaderResources(shaderResourceStartSlot, textureViews.size(), textureViews.data());
+
+		std::vector<ID3D11SamplerState*> samplerStates;
+		samplerStates.reserve(m_samplers.size());
+		for (auto& sampler : m_samplers)
+		{
+			samplerStates.push_back(sampler->RawSampler());
+		}
+		device.pImmediateContext->PSSetSamplers(samplerStartSlot, samplerStates.size(), samplerStates.data());
 	}
 
-	void Material::AddSampler(ID3D11SamplerState *samplerState)
+	void Material::AddSampler(Sampler* sampler)
 	{
-		m_samplerStates.push_back(samplerState);
+		m_samplers.push_back(sampler);
 	}
 
 	void Material::AddTexture(Texture *texture)

@@ -213,6 +213,7 @@ void Entity::Bind(const GraphicsDevice& device)
 
 	if (m_pMaterial)
 	{
+		m_pMaterial->UpdateConstantBuffer(device, *this);
 		m_pMaterial->Activate(device);
 	}
 }

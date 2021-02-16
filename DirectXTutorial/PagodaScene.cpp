@@ -1,7 +1,7 @@
 #include "PagodaScene.h"
 
 #include "Loaders.h"
-#include "PerspectiveMaterial.h"
+#include "ThreeTextureMaterial.h"
 #include "LightMaterial.h"
 #include "ImplicitMesh.h"
 
@@ -26,7 +26,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 	Engine::Texture* pagodaMetallic = new Engine::Texture(device.pDevice, L"F:\\Models\\JapaneseTemple\\Textures\\metallic.png");
 	m_textures.emplace("Pagoda_Metallic", pagodaMetallic);
 
-	Engine::PerspectiveMaterial* pagodaMaterial = new Engine::PerspectiveMaterial();
+	Engine::ThreeTextureMaterial* pagodaMaterial = new Engine::ThreeTextureMaterial();
 	pagodaMaterial->AddTexture(pagodaTexture);
 	pagodaMaterial->AddTexture(pagodaAO);
 	pagodaMaterial->AddTexture(pagodaMetallic);
@@ -93,7 +93,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 		Engine::Texture* floorTexture = new Engine::Texture(device.pDevice, L"F:\\Textures\\Final.png");
 		m_textures.emplace("Floor", floorTexture);
 
-		Engine::PerspectiveMaterial* floorMaterial = new Engine::PerspectiveMaterial();
+		Engine::ThreeTextureMaterial* floorMaterial = new Engine::ThreeTextureMaterial();
 		floorMaterial->AddTexture(floorTexture);
 		floorMaterial->Init(device);
 

@@ -2,7 +2,7 @@
 Texture2D diffuseTexture : register (t0);
 Texture2D aoTexture : register (t1);
 Texture2D metallicTexture : register (t2);
-SamplerState SampleType;
+SamplerState SampleType : register (s0);
 
 struct VOut
 {
