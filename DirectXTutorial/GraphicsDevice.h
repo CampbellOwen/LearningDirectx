@@ -21,10 +21,11 @@ struct GraphicsDevice
 
 	GraphicsDevice(HWND hWnd, uint32_t width, uint32_t height);
 	~GraphicsDevice();
+	ID3D11DeviceContext* Context() const noexcept;
+	void UseImmediateContext() noexcept;
+	void UseDeferredContext() noexcept;
 
 	ID3D11Device* pDevice = nullptr;
-	ID3D11DeviceContext* pImmediateContext = nullptr;
-	ID3D11DeviceContext* pDeferredContext = nullptr;
 	RenderTargetView backbufferRTV;
 	IDXGISwapChain* pSwapchain = nullptr;
 
@@ -32,6 +33,10 @@ struct GraphicsDevice
 	ID3D11Texture2D* pDepthStencilBuffer = nullptr;
 	ID3D11DepthStencilState* pDepthStencilState = nullptr;
 	
+private:
+	ID3D11DeviceContext* m_pCurrContext { nullptr };
+	ID3D11DeviceContext* m_pImmediateContext = nullptr;
+	ID3D11DeviceContext* m_pDeferredContext = nullptr;
 };
 
 struct GPUBuffer

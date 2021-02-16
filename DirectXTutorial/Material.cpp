@@ -101,16 +101,16 @@ namespace Engine
 
 	void Material::Activate(const GraphicsDevice &device, uint32_t shaderResourceStartSlot, uint32_t samplerStartSlot)
 	{
-		device.pImmediateContext->VSSetShader(m_pVertexShader, 0, 0);
-		device.pImmediateContext->PSSetShader(m_pPixelShader, 0, 0);
-		device.pImmediateContext->IASetInputLayout(m_pLayout);
+		device.Context()->VSSetShader(m_pVertexShader, 0, 0);
+		device.Context()->PSSetShader(m_pPixelShader, 0, 0);
+		device.Context()->IASetInputLayout(m_pLayout);
 
 		std::vector<ID3D11ShaderResourceView *> textureViews;
 		for (auto &texture : m_textures)
 		{
 			textureViews.push_back(texture->pResourceView);
 		}
-		device.pImmediateContext->PSSetShaderResources(shaderResourceStartSlot, textureViews.size(), textureViews.data());
+		device.Context()->PSSetShaderResources(shaderResourceStartSlot, textureViews.size(), textureViews.data());
 
 		std::vector<ID3D11SamplerState*> samplerStates;
 		samplerStates.reserve(m_samplers.size());
@@ -118,7 +118,7 @@ namespace Engine
 		{
 			samplerStates.push_back(sampler->RawSampler());
 		}
-		device.pImmediateContext->PSSetSamplers(samplerStartSlot, samplerStates.size(), samplerStates.data());
+		device.Context()->PSSetSamplers(samplerStartSlot, samplerStates.size(), samplerStates.data());
 	}
 
 	void Material::AddSampler(Sampler* sampler)

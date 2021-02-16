@@ -33,7 +33,7 @@ namespace Engine
 			&pSwapchain,
 			&pDevice,
 			NULL,
-			&pImmediateContext);
+			&m_pImmediateContext);
 
 		// Setup Render Target
 		ID3D11Texture2D *pBackBuffer;
@@ -95,7 +95,7 @@ namespace Engine
 		pDevice->CreateDepthStencilState(&dsDesc, &pDSState);
 
 		// Bind depth stencil state
-		pImmediateContext->OMSetDepthStencilState(pDSState, 1);
+		m_pImmediateContext->OMSetDepthStencilState(pDSState, 1);
 		pDSState->Release();
 
 		// Bind depth-stencil resource using a view
@@ -114,7 +114,7 @@ namespace Engine
 
 		pDepthStencil->Release();
 
-		pImmediateContext->OMSetRenderTargets(1, &backbufferRTV.pNativeRTV, pDepthStencilView);
+		m_pImmediateContext->OMSetRenderTargets(1, &backbufferRTV.pNativeRTV, pDepthStencilView);
 
 		// Setup the Viewport
 
@@ -128,9 +128,11 @@ namespace Engine
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
-		pImmediateContext->RSSetViewports(1, &viewport);
+		m_pImmediateContext->RSSetViewports(1, &viewport);
 
-		pDevice->CreateDeferredContext(0, &pDeferredContext);
+		pDevice->CreateDeferredContext(0, &m_pDeferredContext);
+
+		m_pCurrContext = m_pImmediateContext;
 	}
 
 	GraphicsDevice::~GraphicsDevice()
@@ -141,9 +143,24 @@ namespace Engine
 		backbufferRTV.pNativeRTV->Release();
 		pDepthStencilView->Release();
 
-		pImmediateContext->Release();
-		pDeferredContext->Release();
+		m_pImmediateContext->Release();
+		m_pDeferredContext->Release();
 		pDevice->Release();
+	}
+
+	ID3D11DeviceContext* GraphicsDevice::Context() const noexcept
+	{
+		return m_pCurrContext;
+	}
+
+	void GraphicsDevice::UseImmediateContext() noexcept
+	{
+		m_pCurrContext = m_pImmediateContext;
+	}
+
+	void GraphicsDevice::UseDeferredContext() noexcept
+	{ 
+		m_pCurrContext = m_pDeferredContext;
 	}
 
 	GPUBuffer CreateConstantBuffer(const GraphicsDevice &device, size_t numBytes, void *initialData)
@@ -183,7 +200,7 @@ namespace Engine
 		D3D11_MAPPED_SUBRESOURCE resource;
 		ZeroMemory(&resource, sizeof(resource));
 
-		HRESULT hr = device.pImmediateContext->Map(gpuBuffer.pNativeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+		HRESULT hr = device.Context()->Map(gpuBuffer.pNativeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 		if (FAILED(hr))
 		{
 			MessageBoxA(nullptr, Utils::GetHRErrorString(hr).c_str(), "Map constant buffer", MB_OK);
@@ -196,23 +213,23 @@ namespace Engine
 
 	void UnmapConstantBuffer(const GraphicsDevice &device, const MappedGPUBuffer &mappedBuffer)
 	{
-		device.pImmediateContext->Unmap(mappedBuffer.gpuBuffer->pNativeBuffer, 0);
+		device.Context()->Unmap(mappedBuffer.gpuBuffer->pNativeBuffer, 0);
 	}
 
 	void BindConstantBuffer(const GraphicsDevice &device, const GPUBuffer &gpuBuffer, uint32_t bindSlot)
 	{
-		device.pImmediateContext->VSSetConstantBuffers(bindSlot, 1, &gpuBuffer.pNativeBuffer);
-		device.pImmediateContext->PSSetConstantBuffers(bindSlot, 1, &gpuBuffer.pNativeBuffer);
+		device.Context()->VSSetConstantBuffers(bindSlot, 1, &gpuBuffer.pNativeBuffer);
+		device.Context()->PSSetConstantBuffers(bindSlot, 1, &gpuBuffer.pNativeBuffer);
 	}
 
 	void ClearRenderTarget(const GraphicsDevice &device, const RenderTargetView &rtv, float clearColour[])
 	{
-		device.pImmediateContext->ClearRenderTargetView(rtv.pNativeRTV, clearColour);
+		device.Context()->ClearRenderTargetView(rtv.pNativeRTV, clearColour);
 	}
 
 	void ClearDepth(const GraphicsDevice &device, ID3D11DepthStencilView *depthView)
 	{
-		device.pImmediateContext->ClearDepthStencilView(depthView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		device.Context()->ClearDepthStencilView(depthView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 } // namespace Engine

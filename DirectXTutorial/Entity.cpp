@@ -208,7 +208,7 @@ void Entity::Bind(const GraphicsDevice& device)
 {
 	if (m_pMesh)
 	{
-		m_pMesh->Activate(device.pImmediateContext);
+		m_pMesh->Activate(device.Context());
 	}
 
 	if (m_pMaterial)

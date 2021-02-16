@@ -136,7 +136,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void InitUI(HWND hWnd)
 {
-	ui.Init(hWnd, sp_graphicsDevice->pDevice, sp_graphicsDevice->pImmediateContext);
+	ui.Init(hWnd, sp_graphicsDevice->pDevice, sp_graphicsDevice->Context());
 	auto &cameraControlsState = ui.CameraState();
 	auto &objectControlsState = ui.ObjectState();
 	cameraControlsState.aspectRatio = (SCREEN_WIDTH * 1.0f) / SCREEN_HEIGHT;
@@ -234,7 +234,7 @@ void RenderFrame(void)
 		}
 
 		entity->Bind(*sp_graphicsDevice);
-		sp_graphicsDevice->pImmediateContext->Draw(mesh->NumberVertices(), 0);
+		sp_graphicsDevice->Context()->Draw(mesh->NumberVertices(), 0);
 	}
 
 	// Render UI last to draw on top of scene
