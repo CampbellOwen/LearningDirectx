@@ -5,16 +5,10 @@
 #include <stdint.h>
 #include <windows.h>
 
+#include "RenderTexture.h"
 
 namespace Engine
 {
-
-struct RenderTargetView
-{
-	ID3D11RenderTargetView* pNativeRTV;
-	uint32_t width;
-	uint32_t height;
-};
 
 struct GraphicsDevice
 {
@@ -28,7 +22,7 @@ struct GraphicsDevice
 	void UseDeferredContext() noexcept;
 
 	ID3D11Device* pDevice = nullptr;
-	RenderTargetView backbufferRTV;
+	RenderTexture backbufferRenderTexture;
 	IDXGISwapChain* pSwapchain = nullptr;
 
 	ID3D11DepthStencilView* pDepthStencilView = nullptr;
@@ -90,7 +84,7 @@ MappedGPUBuffer MapConstantBuffer(const GraphicsDevice& device, GPUBuffer& gpuBu
 void UnmapConstantBuffer(const GraphicsDevice& device, const MappedGPUBuffer& mappedBuffer);
 void BindConstantBuffer(const GraphicsDevice& device, const GPUBuffer& gpuBuffer, uint32_t bindSlot);
 
-void ClearRenderTarget(const GraphicsDevice& device, const RenderTargetView& rtv, float clearColour[]);
+void ClearRenderTarget(const GraphicsDevice& device, const RenderTexture& rtv, float clearColour[]);
 void ClearDepth(const GraphicsDevice& device, ID3D11DepthStencilView* depthView);
 
 } // namespace Engine

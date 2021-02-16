@@ -43,7 +43,7 @@ void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entit
     renderTargets.reserve(m_outputs.size());
     for (auto& output : m_outputs)
     {
-        renderTargets.push_back(output.RenderTargetView());
+        renderTargets.push_back(output.m_pRenderTargetView);
     }
 
     device.Context()->OMSetRenderTargets(m_outputs.size(), renderTargets.data(), device.pDepthStencilView);

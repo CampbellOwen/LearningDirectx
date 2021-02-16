@@ -1,11 +1,25 @@
 #include "RenderTexture.h"
+
+#include "GraphicsDevice.h"
 #include "Utils.h"
 
 namespace Engine
 {
 
+RenderTexture::RenderTexture(ID3D11RenderTargetView* pRTV, ID3D11Texture2D* pTexture2D, uint32_t width, uint32_t height)
+{
+    m_pRenderTargetView = pRTV;
+    pNativeTexture = pTexture2D;
+    m_width = width;
+    m_height = height;
+}
+
 RenderTexture::RenderTexture(const GraphicsDevice& device, uint32_t width, uint32_t height)
 {
+
+    m_width = width;
+    m_height = height;
+
     D3D11_TEXTURE2D_DESC textureDesc;
     ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
@@ -60,11 +74,6 @@ RenderTexture::~RenderTexture()
     }
 
     Texture::~Texture();
-}
-
-ID3D11RenderTargetView* RenderTexture::RenderTargetView() const noexcept
-{
-    return m_pRenderTargetView;
 }
 
 } // namespace Engine

@@ -1,4 +1,5 @@
 #include "GraphicsDevice.h"
+#include "RenderTexture.h"
 
 #include "Utils.h"
 
@@ -36,14 +37,13 @@ namespace Engine
 			&m_pImmediateContext);
 
 		// Setup Render Target
-		ID3D11Texture2D *pBackBuffer;
-		pSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&pBackBuffer);
+		pSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID *)&backbufferRenderTexture.pNativeTexture);
 
 		// Create render target with backbuffer address
-		pDevice->CreateRenderTargetView(pBackBuffer, NULL, &backbufferRTV.pNativeRTV);
-		backbufferRTV.height = height;
-		backbufferRTV.width = width;
-		pBackBuffer->Release();
+		pDevice->CreateRenderTargetView(backbufferRenderTexture.pNativeTexture, NULL, &backbufferRenderTexture.m_pRenderTargetView);
+
+		backbufferRenderTexture.m_width = width;
+		backbufferRenderTexture.m_height = height;
 
 		// Setup Depth Buffer
 
@@ -114,7 +114,7 @@ namespace Engine
 
 		pDepthStencil->Release();
 
-		m_pImmediateContext->OMSetRenderTargets(1, &backbufferRTV.pNativeRTV, pDepthStencilView);
+		m_pImmediateContext->OMSetRenderTargets(1, &backbufferRenderTexture.m_pRenderTargetView, pDepthStencilView);
 
 		// Setup the Viewport
 
@@ -140,7 +140,6 @@ namespace Engine
 		pSwapchain->SetFullscreenState(FALSE, NULL);
 
 		pSwapchain->Release();
-		backbufferRTV.pNativeRTV->Release();
 		pDepthStencilView->Release();
 
 		m_pImmediateContext->Release();
@@ -232,9 +231,9 @@ namespace Engine
 		device.Context()->PSSetConstantBuffers(bindSlot, 1, &gpuBuffer.pNativeBuffer);
 	}
 
-	void ClearRenderTarget(const GraphicsDevice &device, const RenderTargetView &rtv, float clearColour[])
+	void ClearRenderTarget(const GraphicsDevice &device, const RenderTexture &rtv, float clearColour[])
 	{
-		device.Context()->ClearRenderTargetView(rtv.pNativeRTV, clearColour);
+		device.Context()->ClearRenderTargetView(rtv.m_pRenderTargetView, clearColour);
 	}
 
 	void ClearDepth(const GraphicsDevice &device, ID3D11DepthStencilView *depthView)

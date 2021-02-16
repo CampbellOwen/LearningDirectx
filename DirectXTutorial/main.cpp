@@ -18,8 +18,9 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "PagodaScene.h"
-#include "ThreeTextureMaterial.h"
+#include "RenderPass.h"
 #include "Scene.h"
+#include "ThreeTextureMaterial.h"
 #include "Utils.h"
 
 // Direct 3D Library files
@@ -192,7 +193,7 @@ void RenderFrame(void)
 
 	// Clear render targets
 	Engine::ClearDepth(*sp_graphicsDevice, sp_graphicsDevice->pDepthStencilView);
-	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRTV, ui.ObjectState().backgroundColor);
+	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRenderTexture, ui.ObjectState().backgroundColor);
 
 	// Update constant buffer
 	const auto &cameraControlsState = ui.CameraState();
