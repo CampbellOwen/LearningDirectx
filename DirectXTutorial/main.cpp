@@ -18,7 +18,9 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "PagodaScene.h"
+#include "RenderNormalsMaterial.h"
 #include "RenderPass.h"
+#include "RenderTexture.h"
 #include "Scene.h"
 #include "ThreeTextureMaterial.h"
 #include "Utils.h"
@@ -34,6 +36,12 @@ static Engine::UI::ImGuiInterface ui;
 
 static Engine::GraphicsDevice *sp_graphicsDevice;
 static Engine::GPUBuffer cameraConstantBuffer;
+
+static Engine::RenderPass* mainRenderPass;
+static Engine::RenderPass* normalsPass;
+
+static Engine::RenderTexture* screenSpaceNormals;
+static Engine::RenderNormalsMaterial* normalsMaterial;
 
 static Engine::Scene *pagodaScene;
 static DirectX::XMMATRIX perspectiveMatrix;
@@ -155,6 +163,20 @@ void InitUI(HWND hWnd)
 void InitD3D(HWND hWnd)
 {
 	sp_graphicsDevice = new Engine::GraphicsDevice(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT);
+	std::vector<Engine::RenderTexture*> target { &sp_graphicsDevice->backbufferRenderTexture };
+	mainRenderPass = new Engine::RenderPass(*sp_graphicsDevice, nullptr, target);
+
+	screenSpaceNormals = new Engine::RenderTexture(
+		*sp_graphicsDevice,
+		sp_graphicsDevice->backbufferRenderTexture.m_width,
+		sp_graphicsDevice->backbufferRenderTexture.m_height
+	);
+
+	std::vector<Engine::RenderTexture*> normalsPassTargets { screenSpaceNormals };
+	normalsMaterial = new Engine::RenderNormalsMaterial();
+	normalsMaterial->Init(*sp_graphicsDevice);
+
+	normalsPass = new Engine::RenderPass(*sp_graphicsDevice, normalsMaterial, normalsPassTargets);
 
 	InitUI(hWnd);
 	InitPipeline();
@@ -227,16 +249,8 @@ void RenderFrame(void)
 
 	// Render entities
 	auto entities = pagodaScene->GetEntities();
-	for (auto &entity : entities)
-	{
-		Engine::Mesh* mesh = entity->GetMesh();
-		if (!mesh) {
-			continue;
-		}
-
-		entity->Bind(*sp_graphicsDevice);
-		sp_graphicsDevice->Context()->Draw(mesh->NumberVertices(), 0);
-	}
+	normalsPass->Render(*sp_graphicsDevice, entities);
+	mainRenderPass->Render(*sp_graphicsDevice, entities);
 
 	// Render UI last to draw on top of scene
 	ui.Render();
@@ -249,6 +263,8 @@ void InitPipeline(void)
 {
 	pagodaScene = new Game::PagodaScene();
 	pagodaScene->Load(*sp_graphicsDevice);
+
+	pagodaScene->GetEntity("Floor")->GetMaterial()->AddTexture(screenSpaceNormals);
 
 	//perspectiveConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(Engine::PerspectiveConstantBuffer));
 	cameraConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(CameraConstantBuffer), nullptr);

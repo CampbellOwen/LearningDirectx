@@ -21,6 +21,8 @@ struct GraphicsDevice
 	void UseImmediateContext() noexcept;
 	void UseDeferredContext() noexcept;
 
+	void UnBindResources() const noexcept;
+
 	ID3D11Device* pDevice = nullptr;
 	RenderTexture backbufferRenderTexture;
 	IDXGISwapChain* pSwapchain = nullptr;

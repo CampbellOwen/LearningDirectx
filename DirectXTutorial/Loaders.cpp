@@ -26,7 +26,7 @@ namespace Loaders
 			
 		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
 		if (!warn.empty()) {
-			MessageBoxA(nullptr, warn.c_str(), "tinyobj warning", MB_OK);
+			//MessageBoxA(nullptr, warn.c_str(), "tinyobj warning", MB_OK);
 		}
 		if (!err.empty()) {
 			MessageBoxA(nullptr, err.c_str(), "tinyobj error", MB_OK);

@@ -18,7 +18,7 @@ namespace Engine
 		scd.BufferDesc.Height = height;
 		scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		scd.OutputWindow = hWnd;
-		scd.SampleDesc.Count = 4;
+		scd.SampleDesc.Count = 1;
 		scd.Windowed = TRUE;
 		scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
@@ -54,7 +54,7 @@ namespace Engine
 		descDepth.MipLevels = 1;
 		descDepth.ArraySize = 1;
 		descDepth.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-		descDepth.SampleDesc.Count = 4;
+		descDepth.SampleDesc.Count = 1;
 		descDepth.SampleDesc.Quality = 0;
 		descDepth.Usage = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -170,6 +170,13 @@ namespace Engine
 	void GraphicsDevice::UseDeferredContext() noexcept
 	{ 
 		m_pCurrContext = m_pDeferredContext;
+	}
+
+	void GraphicsDevice::UnBindResources() const noexcept
+	{
+		ID3D11ShaderResourceView* nullSRV[3] = { nullptr, nullptr, nullptr };
+		m_pImmediateContext->PSSetShaderResources(0, 3, nullSRV);
+		m_pImmediateContext->VSSetShaderResources(0, 3, nullSRV);
 	}
 
 	GPUBuffer CreateConstantBuffer(const GraphicsDevice &device, size_t numBytes, void *initialData)

@@ -8,7 +8,7 @@ namespace Engine
 static constexpr uint32_t MAX_OUTPUTS = 8;
 
 
-RenderPass::RenderPass(const GraphicsDevice& device, Material* material, std::vector<RenderTexture> outputs)
+RenderPass::RenderPass(const GraphicsDevice& device, Material* material, std::vector<RenderTexture*> outputs)
 {
     m_material = material;
     m_outputs = outputs;
@@ -26,8 +26,11 @@ RenderPass::RenderPass(const GraphicsDevice& device, Material* material, uint32_
 
     for (int i = 0; i < numOutputs; i++)
     {
-        m_outputs.emplace_back(device, width, height);
+        m_outputs.push_back(new RenderTexture(device, width, height));
     }
+
+    // Since we created the RenderTextures, we have to free them
+    m_ownOutputs = true;
 
 }
 
@@ -43,7 +46,7 @@ void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entit
     renderTargets.reserve(m_outputs.size());
     for (auto& output : m_outputs)
     {
-        renderTargets.push_back(output.m_pRenderTargetView);
+        renderTargets.push_back(output->m_pRenderTargetView);
     }
 
     device.Context()->OMSetRenderTargets(m_outputs.size(), renderTargets.data(), device.pDepthStencilView);
@@ -66,6 +69,8 @@ void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entit
         }
 		device.Context()->Draw(mesh->NumberVertices(), 0);
 	}
+
+    device.UnBindResources();
 }
 
 } // namespace Engine
