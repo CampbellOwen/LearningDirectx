@@ -1,9 +1,11 @@
 #include "PagodaScene.h"
 
-#include "Loaders.h"
-#include "ThreeTextureMaterial.h"
-#include "LightMaterial.h"
 #include "ImplicitMesh.h"
+#include "LightMaterial.h"
+#include "Loaders.h"
+#include "PagodaEntity.h"
+#include "ThreeTextureMaterial.h"
+
 
 namespace Game
 {
@@ -37,7 +39,10 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 	m_materials.emplace("Perspective", pagodaMaterial);
 
-	Engine::Entity* pagoda = new Engine::Entity();
+	Engine::PagodaEntity* pagoda = new Engine::PagodaEntity();
+	pagoda->SetPosition(DirectX::XMFLOAT3(-6.878f, -8.341f, 8.0f));
+	pagoda->SetRotation(Engine::Axis::Y, 2.421f);
+
 	m_entities.emplace("Pagoda", pagoda);
 
 	pagoda->Init(pagodaMesh, pagodaMaterial);

@@ -8,7 +8,7 @@ namespace Engine
 static constexpr uint32_t MAX_OUTPUTS = 8;
 
 
-RenderPass::RenderPass(const GraphicsDevice& device, Material* material, std::vector<RenderTexture*> outputs)
+RenderPass::RenderPass(Material* material, std::vector<RenderTexture*> outputs)
 {
     m_material = material;
     m_outputs = outputs;
@@ -34,9 +34,9 @@ RenderPass::RenderPass(const GraphicsDevice& device, Material* material, uint32_
 
 }
 
-void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entities)
+void RenderPass::Render(const GraphicsDevice& device, Scene* scene)
 {
-    bool useEntityMaterial = m_material == nullptr;
+   bool useEntityMaterial = m_material == nullptr;
     if (!useEntityMaterial)
     {
         m_material->Activate(device);
@@ -47,11 +47,15 @@ void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entit
     for (auto& output : m_outputs)
     {
         renderTargets.push_back(output->m_pRenderTargetView);
+        if (m_clearOutputs)
+        {
+           ClearRenderTarget(device, *output, m_clearColour);
+        }
     }
 
     device.Context()->OMSetRenderTargets(m_outputs.size(), renderTargets.data(), device.pDepthStencilView);
 
-	for (auto& entity : entities)
+	for (auto& entity : scene->GetEntities())
 	{
 		Engine::Mesh* mesh = entity->GetMesh();
 		if (!mesh) {
@@ -71,6 +75,24 @@ void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entit
 	}
 
     device.UnBindResources();
+}
+
+void RenderPass::SetClearColour(float colour[4])
+{
+   for (int i = 0; i < 4; i++)
+   {
+      m_clearColour[i] = colour[i];
+   }
+}
+
+void RenderPass::EnableClearOutput()
+{
+   m_clearOutputs = true;
+}
+
+void RenderPass::DisableClearOutput()
+{
+   m_clearOutputs = false;
 }
 
 } // namespace Engine

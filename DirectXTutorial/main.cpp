@@ -23,6 +23,7 @@
 #include "RenderTexture.h"
 #include "Scene.h"
 #include "ThreeTextureMaterial.h"
+#include "UIRenderPass.h"
 #include "Utils.h"
 
 // Direct 3D Library files
@@ -39,6 +40,7 @@ static Engine::GPUBuffer cameraConstantBuffer;
 
 static Engine::RenderPass* mainRenderPass;
 static Engine::RenderPass* normalsPass;
+static Engine::UIRenderPass* uiPass;
 
 static Engine::RenderTexture* screenSpaceNormals;
 static Engine::RenderNormalsMaterial* normalsMaterial;
@@ -164,7 +166,7 @@ void InitD3D(HWND hWnd)
 {
 	sp_graphicsDevice = new Engine::GraphicsDevice(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT);
 	std::vector<Engine::RenderTexture*> target { &sp_graphicsDevice->backbufferRenderTexture };
-	mainRenderPass = new Engine::RenderPass(*sp_graphicsDevice, nullptr, target);
+	mainRenderPass = new Engine::RenderPass(nullptr, target);
 
 	screenSpaceNormals = new Engine::RenderTexture(
 		*sp_graphicsDevice,
@@ -176,7 +178,9 @@ void InitD3D(HWND hWnd)
 	normalsMaterial = new Engine::RenderNormalsMaterial();
 	normalsMaterial->Init(*sp_graphicsDevice);
 
-	normalsPass = new Engine::RenderPass(*sp_graphicsDevice, normalsMaterial, normalsPassTargets);
+	normalsPass = new Engine::RenderPass(normalsMaterial, normalsPassTargets);
+
+	uiPass = new Engine::UIRenderPass(target);
 
 	InitUI(hWnd);
 	InitPipeline();
@@ -198,12 +202,6 @@ struct CameraConstantBuffer
 
 void Update()
 {
-	const auto &objectControlsState = ui.ObjectState();
-
-	Engine::Entity *mainPagoda = pagodaScene->GetEntity("Pagoda");
-	mainPagoda->SetPosition(DirectX::XMFLOAT3(objectControlsState.x, objectControlsState.y, objectControlsState.z));
-	mainPagoda->SetRotation(DirectX::XMFLOAT3(objectControlsState.rotx, objectControlsState.roty, objectControlsState.rotz));
-
 	for (auto &entity : pagodaScene->GetEntities())
 	{
 		entity->Update();
@@ -215,7 +213,8 @@ void RenderFrame(void)
 
 	// Clear render targets
 	Engine::ClearDepth(*sp_graphicsDevice, sp_graphicsDevice->pDepthStencilView);
-	Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRenderTexture, ui.ObjectState().backgroundColor);
+	//Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRenderTexture, ui.ObjectState().backgroundColor);
+	mainRenderPass->SetClearColour(ui.ObjectState().backgroundColor);
 
 	// Update constant buffer
 	const auto &cameraControlsState = ui.CameraState();
@@ -247,13 +246,12 @@ void RenderFrame(void)
 
 	Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
 
-	// Render entities
-	auto entities = pagodaScene->GetEntities();
-	normalsPass->Render(*sp_graphicsDevice, entities);
-	mainRenderPass->Render(*sp_graphicsDevice, entities);
+	normalsPass->Render(*sp_graphicsDevice, pagodaScene);
+	mainRenderPass->Render(*sp_graphicsDevice, pagodaScene);
+	uiPass->Render(*sp_graphicsDevice, pagodaScene);
 
 	// Render UI last to draw on top of scene
-	ui.Render();
+	//ui.Render();
 
 	// Swap buffers
 	sp_graphicsDevice->pSwapchain->Present(0, 0);

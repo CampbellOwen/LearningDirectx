@@ -67,6 +67,10 @@ public:
 	{
 	}
 
+	virtual void DrawUI() 
+	{
+	}
+
 	DirectX::XMMATRIX GetTransform() const
 	{
 	    return m_transform;
@@ -77,16 +81,16 @@ public:
 private:
 	void UpdateTransform();
 
-private:
-	 Material* m_pMaterial;
-	 Mesh* m_pMesh;
-	 DirectX::XMFLOAT3 m_position;
-	 DirectX::XMFLOAT3 m_rotation;
-	 DirectX::XMFLOAT3 m_scale;
+protected:
+   Material* m_pMaterial { nullptr };
+   Mesh* m_pMesh { nullptr };
+   DirectX::XMFLOAT3 m_position;
+   DirectX::XMFLOAT3 m_rotation;
+   DirectX::XMFLOAT3 m_scale;
 
-	 DirectX::XMMATRIX m_transform;
+   DirectX::XMMATRIX m_transform;
 
-	 Entity* m_parent;
+	Entity* m_parent { nullptr };
 };
 
 } // namespace Engine
