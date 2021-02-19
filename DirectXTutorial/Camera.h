@@ -2,30 +2,47 @@
 
 #include <DirectXMath.h>
 
+#include "Entity.h"
+
 namespace Engine 
 {
 
-class Camera
+static struct ConstantBuffer
+{
+	DirectX::XMMATRIX view;
+	DirectX::XMMATRIX projection;
+	DirectX::XMFLOAT4 cameraPos;
+	DirectX::XMFLOAT4 lightPos;
+};
+
+
+class Camera : public Entity
 {
 public:
+	Camera(
+		const GraphicsDevice& device,
+		std::string name,
+		float fov = 0.785398f,
+		float aspectRatio = 1.3333333f,
+		float nearClippingPlane = 1.0f,
+		float farClippingPlane = 300.0f);
+
+	void LookAt(DirectX::XMFLOAT3 dir, DirectX::XMFLOAT3 up);
+
+	void Bind(const GraphicsDevice& device, bool useMaterial) override;
+	void Update(const GraphicsDevice& device) override;
+	void DrawUI() override;
 
 private:
 
 private:
 
-	DirectX::XMFLOAT3 m_position;
-	DirectX::XMFLOAT3 m_focusDirection;
-	DirectX::XMFLOAT3 m_upDirection;
+   float m_fov;
+   float m_aspectRatio;
+   float m_nearClippingPlane;
+   float m_farClippingPane;
 
-	DirectX::XMFLOAT4X4 m_viewMatrix;
-	DirectX::XMFLOAT4X4 m_projectionMatrix;
-
-	float m_fov;
-	float m_aspectRatio;
-	float m_nearClippingPlane;
-	float m_farClippingPane;
-
-
+	GPUBuffer m_gpuBuffer;
 };
 
 } // namespace Engine

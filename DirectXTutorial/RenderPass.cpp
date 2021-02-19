@@ -1,5 +1,6 @@
 #include "RenderPass.h"
 
+#include "Camera.h"
 #include "Utils.h"
 
 namespace Engine
@@ -55,24 +56,18 @@ void RenderPass::Render(const GraphicsDevice& device, Scene* scene)
 
     device.Context()->OMSetRenderTargets(m_outputs.size(), renderTargets.data(), device.pDepthStencilView);
 
-	for (auto& entity : scene->GetEntities())
-	{
-		Engine::Mesh* mesh = entity->GetMesh();
-		if (!mesh) {
-			continue;
-		}
+    scene->BindCameras(device);
 
-        if (useEntityMaterial)
+    for (auto& entity : scene->GetEntities())
+    {
+        entity->Bind(device, useEntityMaterial);
+
+        Engine::Mesh* mesh = entity->GetMesh();
+        if (mesh)
         {
-            entity->Bind(device);
+           device.Context()->Draw(mesh->NumberVertices(), 0);
         }
-        else
-        {
-            mesh->Activate(device.Context());
-            m_material->UpdateConstantBuffer(device, *entity);
-        }
-		device.Context()->Draw(mesh->NumberVertices(), 0);
-	}
+    }
 
     device.UnBindResources();
 }

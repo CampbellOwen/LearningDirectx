@@ -204,13 +204,12 @@ void Update()
 {
 	for (auto &entity : pagodaScene->GetEntities())
 	{
-		entity->Update();
+		entity->Update(*sp_graphicsDevice);
 	}
 }
 
 void RenderFrame(void)
 {
-
 	// Clear render targets
 	Engine::ClearDepth(*sp_graphicsDevice, sp_graphicsDevice->pDepthStencilView);
 	//Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRenderTexture, ui.ObjectState().backgroundColor);
@@ -219,32 +218,32 @@ void RenderFrame(void)
 	// Update constant buffer
 	const auto &cameraControlsState = ui.CameraState();
 	const auto &sceneControlsState = ui.SceneState();
-	Engine::MappedGPUBuffer mappedCameraBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer);
-	{
+	//Engine::MappedGPUBuffer mappedCameraBuffer = Engine::MapConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer);
+	//{
 
-		CameraConstantBuffer *pBuffer = reinterpret_cast<CameraConstantBuffer *>(mappedCameraBuffer.data);
-		pBuffer->view = DirectX::XMMatrixTranslation(
-			0.0f,
-			0.0f,
-			-20.0f);
+	//	CameraConstantBuffer *pBuffer = reinterpret_cast<CameraConstantBuffer *>(mappedCameraBuffer.data);
+	//	pBuffer->view = DirectX::XMMatrixTranslation(
+	//		0.0f,
+	//		0.0f,
+	//		-20.0f);
 
-		pBuffer->view = DirectX::XMMatrixInverse(nullptr, pBuffer->view);
-		pBuffer->projection = DirectX::XMMatrixPerspectiveFovLH(
-			cameraControlsState.fov,
-			cameraControlsState.aspectRatio,
-			cameraControlsState.nearZ,
-			cameraControlsState.farZ);
+	//	pBuffer->view = DirectX::XMMatrixInverse(nullptr, pBuffer->view);
+	//	pBuffer->projection = DirectX::XMMatrixPerspectiveFovLH(
+	//		cameraControlsState.fov,
+	//		cameraControlsState.aspectRatio,
+	//		cameraControlsState.nearZ,
+	//		cameraControlsState.farZ);
 
-		pBuffer->cameraPos = DirectX::XMFLOAT4(0.0f, 0.0f, -20.0f, 1.0f);
-		pBuffer->lightPos = DirectX::XMFLOAT4(
-			sceneControlsState.lightx,
-			sceneControlsState.lighty,
-			sceneControlsState.lightz,
-			1.0f);
-	}
-	Engine::UnmapConstantBuffer(*sp_graphicsDevice, mappedCameraBuffer);
+	//	pBuffer->cameraPos = DirectX::XMFLOAT4(0.0f, 0.0f, -20.0f, 1.0f);
+	//	pBuffer->lightPos = DirectX::XMFLOAT4(
+	//		sceneControlsState.lightx,
+	//		sceneControlsState.lighty,
+	//		sceneControlsState.lightz,
+	//		1.0f);
+	//}
+	//Engine::UnmapConstantBuffer(*sp_graphicsDevice, mappedCameraBuffer);
 
-	Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
+	//Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
 
 	normalsPass->Render(*sp_graphicsDevice, pagodaScene);
 	mainRenderPass->Render(*sp_graphicsDevice, pagodaScene);

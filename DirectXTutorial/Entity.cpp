@@ -204,16 +204,16 @@ void Entity::ApplyScale(DirectX::XMFLOAT3 scale)
 	 UpdateTransform();
 }
 
-void Entity::Bind(const GraphicsDevice& device)
+void Entity::Bind(const GraphicsDevice& device, bool useMaterial)
 {
 	if (m_pMesh)
 	{
 		m_pMesh->Activate(device.Context());
 	}
 
-	if (m_pMaterial)
+   m_pMaterial->UpdateConstantBuffer(device, *this);
+	if (m_pMaterial && useMaterial)
 	{
-		m_pMaterial->UpdateConstantBuffer(device, *this);
 		m_pMaterial->Activate(device);
 	}
 }

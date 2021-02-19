@@ -1,5 +1,6 @@
 #include "PagodaScene.h"
 
+#include "Camera.h"
 #include "ImplicitMesh.h"
 #include "LightMaterial.h"
 #include "Loaders.h"
@@ -12,6 +13,11 @@ namespace Game
 
 void PagodaScene::Load(const Engine::GraphicsDevice& device)
 {
+
+	Engine::Camera* camera = new Engine::Camera(device, "Main Camera");
+	camera->MovePosition(Engine::Axis::Z, -20.0f);
+	//m_entities.emplace("Main Camera", camera);
+	AddCamera(camera, true);
 
 	const std::vector<Engine::VERTEX> pagodaVerts = Engine::Loaders::LoadObj("F:\\Models\\JapaneseTemple\\model.obj");
 	Engine::Mesh* pagodaMesh = new Engine::Mesh();
@@ -39,7 +45,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 	m_materials.emplace("Perspective", pagodaMaterial);
 
-	Engine::PagodaEntity* pagoda = new Engine::PagodaEntity();
+	Engine::Entity* pagoda = new Engine::Entity("Pagoda 1");
 	pagoda->SetPosition(DirectX::XMFLOAT3(-6.878f, -8.341f, 8.0f));
 	pagoda->SetRotation(Engine::Axis::Y, 2.421f);
 
@@ -47,7 +53,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 	pagoda->Init(pagodaMesh, pagodaMaterial);
 
-	Engine::Entity* otherPagoda = new Engine::Entity();
+	Engine::Entity* otherPagoda = new Engine::Entity("Pagoda 2");
 	m_entities.emplace("Pagoda2", otherPagoda);
 	otherPagoda->Init(pagodaMesh, pagodaMaterial);
 
@@ -61,7 +67,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 	lightMesh->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	m_meshes.emplace("LightMesh", lightMesh);
 
-	Engine::Entity* light = new Engine::Entity();
+	Engine::Entity* light = new Engine::Entity("Light");
 	m_entities.emplace("Light", light);
 	light->Init(lightMesh, lightMaterial);
 
@@ -108,7 +114,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 		m_materials.emplace("Floor", floorMaterial);
 
-		Engine::Entity* floorEntity = new Engine::Entity();
+		Engine::Entity* floorEntity = new Engine::Entity("Floor");
 		m_entities.emplace("Floor", floorEntity);
 		floorEntity->Init(floorMesh, floorMaterial);
 		floorEntity->SetPosition(DirectX::XMFLOAT3(0.0f, -8.341f, 0.0f));

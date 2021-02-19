@@ -33,7 +33,6 @@ bool ThreeTextureMaterial::Init(const GraphicsDevice& device)
 void ThreeTextureMaterial::Activate(const GraphicsDevice &device, uint32_t shaderResourceStartSlot, uint32_t samplerStartSlot)
 {
 	Material::Activate(device, shaderResourceStartSlot, samplerStartSlot);
-	Engine::BindConstantBuffer(device, m_gpuBuffer, 1);
 }
 
 void ThreeTextureMaterial::UpdateConstantBuffer(const GraphicsDevice& device, const Entity& entity)
@@ -44,6 +43,7 @@ void ThreeTextureMaterial::UpdateConstantBuffer(const GraphicsDevice& device, co
 		pBuffer->worldTransform = entity.GetTransform();
 	}
 	Engine::UnmapConstantBuffer(device, cbuffer);
+	Engine::BindConstantBuffer(device, m_gpuBuffer, 1);
 }
 
 } // namespace Engine

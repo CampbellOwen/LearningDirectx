@@ -5,13 +5,28 @@ namespace Engine
 
 Entity* Scene::AddEntity(std::string id)
 {
-	m_entities[id] = new Entity();
+	m_entities[id] = new Entity(id);
 	return m_entities[id];
 }
 
 Entity* Scene::GetEntity(std::string id)
 {
 	return m_entities[id];
+}
+
+void Scene::AddCamera(Camera* camera, bool active)
+{
+	m_cameras.emplace(camera->m_name, camera);
+
+	if (active)
+	{
+		activeCamera = camera;
+	}
+}
+
+void Scene::BindCameras(const GraphicsDevice& device)
+{
+	activeCamera->Bind(device, false);
 }
 
 std::vector<Entity*> Scene::GetEntities()
