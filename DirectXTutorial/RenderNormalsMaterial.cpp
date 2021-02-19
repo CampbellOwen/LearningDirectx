@@ -36,7 +36,7 @@ bool RenderNormalsMaterial::Init(const GraphicsDevice& device)
 void RenderNormalsMaterial::Activate(const GraphicsDevice &device, uint32_t shaderResourceStartSlot, uint32_t samplerStartSlot)
 {
 	Material::Activate(device, shaderResourceStartSlot, samplerStartSlot);
-	Engine::BindConstantBuffer(device, m_gpuBuffer, 1);
+	Engine::BindConstantBuffer(device, m_gpuBuffer, 2);
 }
 
 void RenderNormalsMaterial::UpdateConstantBuffer(const GraphicsDevice& device, const Entity& entity)

@@ -3,6 +3,23 @@
 namespace Engine
 {
 
+static struct LightsBuffer
+{
+	int numLights;
+	int padding[3];
+	LightConstantBuffer lights[Scene::MAX_NUM_LIGHTS];
+};
+
+Scene::Scene(const GraphicsDevice& device) : 
+	m_lightBuffer(
+		CreateConstantBuffer(
+			device, 
+			sizeof(LightsBuffer),
+			nullptr))
+{
+
+}
+
 Entity* Scene::AddEntity(std::string id)
 {
 	m_entities[id] = new Entity(id);
@@ -38,6 +55,28 @@ std::vector<Entity*> Scene::GetEntities()
 	}
 
 	return entities;
+}
+
+void Scene::AddLight(Light* light)
+{
+   assert(m_numLights < MAX_NUM_LIGHTS);
+	m_lights[m_numLights++] = light;
+}
+
+void Scene::BindLights(const GraphicsDevice& device)
+{
+	Engine::MappedGPUBuffer cbuffer = Engine::MapConstantBuffer(device, m_lightBuffer);
+	{
+		LightsBuffer* pBuffer = reinterpret_cast<LightsBuffer*>(cbuffer.data);
+		pBuffer->numLights = static_cast<int>(m_numLights);
+      for (size_t i = 0; i < m_numLights; i++)
+      {
+			m_lights[i]->UpdateConstantBuffer(&pBuffer->lights[i]);
+      }
+	}
+
+	Engine::UnmapConstantBuffer(device, cbuffer);
+   BindConstantBuffer(device, m_lightBuffer, 1 /* Light constants always in slot 1 */);
 }
 
 Scene::~Scene()

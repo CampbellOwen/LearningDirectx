@@ -211,10 +211,13 @@ void Entity::Bind(const GraphicsDevice& device, bool useMaterial)
 		m_pMesh->Activate(device.Context());
 	}
 
-   m_pMaterial->UpdateConstantBuffer(device, *this);
-	if (m_pMaterial && useMaterial)
+	if (m_pMaterial)
 	{
-		m_pMaterial->Activate(device);
+      m_pMaterial->UpdateConstantBuffer(device, *this);
+		if (useMaterial)
+		{
+         m_pMaterial->Activate(device);
+		}
 	}
 }
 

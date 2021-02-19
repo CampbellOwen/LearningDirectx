@@ -3,6 +3,15 @@
 namespace Engine
 {
 
+static struct ConstantBuffer
+{
+	DirectX::XMMATRIX view;
+	DirectX::XMMATRIX projection;
+	DirectX::XMFLOAT4 cameraPos;
+	DirectX::XMFLOAT4 lightPos;
+};
+
+
 Camera::Camera(
    const GraphicsDevice& device, 
    std::string name,
@@ -59,7 +68,7 @@ void Camera::DrawUI()
    Entity::DrawUI();
       ImGui::Begin(m_name.c_str());
       
-      ImGui::SliderFloat("FOV", &m_fov, 0.001, M_PI);
+      ImGui::SliderFloat("FOV", &m_fov, 0.001, (3 * M_PI) / 4);
       
       ImGui::End();
 }

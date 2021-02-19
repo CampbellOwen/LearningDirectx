@@ -7,15 +7,6 @@
 namespace Engine 
 {
 
-static struct ConstantBuffer
-{
-	DirectX::XMMATRIX view;
-	DirectX::XMMATRIX projection;
-	DirectX::XMFLOAT4 cameraPos;
-	DirectX::XMFLOAT4 lightPos;
-};
-
-
 class Camera : public Entity
 {
 public:
@@ -29,8 +20,8 @@ public:
 
 	void LookAt(DirectX::XMFLOAT3 dir, DirectX::XMFLOAT3 up);
 
-	void Bind(const GraphicsDevice& device, bool useMaterial) override;
 	void Update(const GraphicsDevice& device) override;
+	void Bind(const GraphicsDevice& device, bool useMaterial) override;
 	void DrawUI() override;
 
 private:

@@ -17,10 +17,23 @@ cbuffer CameraConstants : register(b0)
 	float4x4 camera;
 	float4x4 projection;
 	float4 cameraPos;
-	float4 lightPos;
 }
 
-cbuffer ModelConstants : register(b1)
+struct Light
+{
+	float4 position;
+	int type;
+	int padding[3];
+};
+
+cbuffer LightConstants : register(b1)
+{
+	int numLights;
+	int padding[3];
+	Light lights[8];
+}
+
+cbuffer ModelConstants : register(b2)
 {
 	float4x4 world;
 }
@@ -60,6 +73,9 @@ static const float PI = 3.14159265f;
 
 float4 PShader(VOut input) : SV_TARGET
 {
+
+	float4 lightPos = lights[0].position;
+
 	float4 textureSample = diffuseTexture.Sample(SampleType, input.texCoord);
 	float4 aoSample = aoTexture.Sample(SampleType, input.texCoord);
 	

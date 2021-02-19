@@ -56,8 +56,6 @@ void RenderPass::Render(const GraphicsDevice& device, Scene* scene)
 
     device.Context()->OMSetRenderTargets(m_outputs.size(), renderTargets.data(), device.pDepthStencilView);
 
-    scene->BindCameras(device);
-
     for (auto& entity : scene->GetEntities())
     {
         entity->Bind(device, useEntityMaterial);

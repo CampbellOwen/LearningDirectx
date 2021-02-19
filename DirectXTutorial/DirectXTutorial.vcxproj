@@ -151,6 +151,7 @@
     <ClCompile Include="ImGUI\imgui_impl_dx11.cpp" />
     <ClCompile Include="ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="LightMaterial.cpp" />
     <ClCompile Include="Loaders.cpp" />
     <ClCompile Include="main.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="ImGUI\imstb_textedit.h" />
     <ClInclude Include="ImGUI\imstb_truetype.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="LightMaterial.h" />
     <ClInclude Include="PagodaEntity.h" />
     <ClInclude Include="PagodaScene.h" />

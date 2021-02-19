@@ -43,7 +43,7 @@ void ThreeTextureMaterial::UpdateConstantBuffer(const GraphicsDevice& device, co
 		pBuffer->worldTransform = entity.GetTransform();
 	}
 	Engine::UnmapConstantBuffer(device, cbuffer);
-	Engine::BindConstantBuffer(device, m_gpuBuffer, 1);
+	Engine::BindConstantBuffer(device, m_gpuBuffer, 2 /* Model constants in slot 2*/);
 }
 
 } // namespace Engine

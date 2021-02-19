@@ -215,6 +215,11 @@ void RenderFrame(void)
 	//Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRenderTexture, ui.ObjectState().backgroundColor);
 	mainRenderPass->SetClearColour(ui.ObjectState().backgroundColor);
 
+
+    pagodaScene->BindCameras(*sp_graphicsDevice);
+    pagodaScene->BindLights(*sp_graphicsDevice);
+
+
 	// Update constant buffer
 	const auto &cameraControlsState = ui.CameraState();
 	const auto &sceneControlsState = ui.SceneState();
@@ -258,7 +263,7 @@ void RenderFrame(void)
 
 void InitPipeline(void)
 {
-	pagodaScene = new Game::PagodaScene();
+	pagodaScene = new Game::PagodaScene(*sp_graphicsDevice);
 	pagodaScene->Load(*sp_graphicsDevice);
 
 	pagodaScene->GetEntity("Floor")->GetMaterial()->AddTexture(screenSpaceNormals);

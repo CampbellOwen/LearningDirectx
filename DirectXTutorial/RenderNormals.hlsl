@@ -13,7 +13,7 @@ cbuffer CameraConstants : register(b0)
 	float4 lightPos;
 }
 
-cbuffer ModelConstants : register(b1)
+cbuffer ModelConstants : register(b2)
 {
 	float4x4 world;
 }

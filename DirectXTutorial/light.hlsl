@@ -7,6 +7,11 @@ cbuffer CameraConstants : register(b0)
 	float4 lightPos;
 }
 
+cbuffer ModelConstants : register(b2)
+{
+	float4x4 world;
+}
+
 struct VSIn
 {
 	uint vertexId : SV_VertexID;
@@ -15,13 +20,13 @@ struct VSIn
 float4 VS(VSIn input) : SV_Position
 {
 	if (input.vertexId == 0)
-		return mul(projection, mul(camera, lightPos - float4(-0.1f, -0.1f, 0.0f, 0.0f)));
+		return mul(projection, mul(camera, mul(world, float4(-0.01f, -0.01f, 0.0f, 0.0f))));
 	else if (input.vertexId == 1)
-		return mul(projection, mul(camera, lightPos - float4(-0.1f, +0.1f, 0.0f, 0.0f)));
+		return mul(projection, mul(camera, mul(world, float4(-0.01f, +0.01f, 0.0f, 0.0f))));
 	else if (input.vertexId == 2)
-		return mul(projection, mul(camera, lightPos - float4(+0.1f, -0.1f, 0.0f, 0.0f)));
+		return mul(projection, mul(camera, mul(world, float4(+0.01f, -0.01f, 0.0f, 0.0f))));
 	else if (input.vertexId == 3)
-		return mul(projection, mul(camera, lightPos - float4(+0.1f, +0.1f, 0.0f, 0.0f)));
+		return mul(projection, mul(camera, mul(world, float4(+0.01f, +0.01f, 0.0f, 0.0f))));
 
 	return float4(0.f, 0.0f, 0.0f, 0.0f);
 }

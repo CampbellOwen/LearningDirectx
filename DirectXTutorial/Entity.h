@@ -127,9 +127,9 @@ protected:
 
    Material* m_pMaterial { nullptr };
    Mesh* m_pMesh { nullptr };
-   DirectX::XMFLOAT3 m_position;
-   DirectX::XMFLOAT3 m_rotation;
-   DirectX::XMFLOAT3 m_scale;
+	DirectX::XMFLOAT3 m_position { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 m_rotation { 0.0f, 0.0f, 0.0f };
+	DirectX::XMFLOAT3 m_scale { 1.0f, 1.0f, 1.0f };
 
    DirectX::XMMATRIX m_transform;
 

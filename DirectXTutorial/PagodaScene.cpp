@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "ImplicitMesh.h"
+#include "Light.h"
 #include "LightMaterial.h"
 #include "Loaders.h"
 #include "PagodaEntity.h"
@@ -16,7 +17,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 
 	Engine::Camera* camera = new Engine::Camera(device, "Main Camera");
 	camera->MovePosition(Engine::Axis::Z, -20.0f);
-	//m_entities.emplace("Main Camera", camera);
+	m_entities.emplace("Main Camera", camera);
 	AddCamera(camera, true);
 
 	const std::vector<Engine::VERTEX> pagodaVerts = Engine::Loaders::LoadObj("F:\\Models\\JapaneseTemple\\model.obj");
@@ -67,9 +68,12 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 	lightMesh->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	m_meshes.emplace("LightMesh", lightMesh);
 
-	Engine::Entity* light = new Engine::Entity("Light");
+	Engine::Light* light = new Engine::Light("Light");
 	m_entities.emplace("Light", light);
-	light->Init(lightMesh, lightMaterial);
+	AddLight(light);
+	//light->Init(lightMesh, lightMaterial);
+	light->Init(nullptr, nullptr);
+	light->SetPosition(Engine::Axis::Z, 10.0f);
 
 	{ // Add floor
 		const std::vector<Engine::VERTEX> floorVerts{
