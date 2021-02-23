@@ -21,15 +21,15 @@ cbuffer CameraConstants : register(b0)
 
 struct Light
 {
-	float4 position;
 	int type;
-	int padding[3];
+	float3 padding;
+	float4 position;
 };
 
 cbuffer LightConstants : register(b1)
 {
 	int numLights;
-	int padding[3];
+	float3 padding;
 	Light lights[8];
 }
 
@@ -71,39 +71,45 @@ VOut VShader(VertexInputType input)
 
 static const float PI = 3.14159265f;
 
+float2 diffuseSpecularFromLight(float3 lightDir, float3 normal, float3 view, float specularConstant)
+{
+	float distance = length(lightDir);
+	float3 lightDirNorm = normalize(lightDir);
+
+	float NdotL = dot(normal, lightDirNorm);
+	float diffuse_intensity = saturate(NdotL);
+	float kd = diffuse_intensity / (distance / 10);
+
+	float3 reflected = normalize((2 * NdotL * normal) - lightDirNorm);
+
+	float ks = NdotL * pow(saturate(dot(reflected, view)), specularConstant) * ((specularConstant + 8.0f) / (8.0f * PI));
+
+	return float2(kd, ks);
+}
+
 float4 PShader(VOut input) : SV_TARGET
 {
 
-	float4 lightPos = lights[0].position;
 
-	float4 textureSample = diffuseTexture.Sample(SampleType, input.texCoord);
-	float4 aoSample = aoTexture.Sample(SampleType, input.texCoord);
+	float2 kdks = float2(0.0f, 0.0f);
 	
-	float3 lightDir = lightPos.xyz - input.worldPos;
-	float distance = length(lightDir);
-	lightDir = lightDir / distance;
+   float4 textureSample = diffuseTexture.Sample(SampleType, input.texCoord);
+   float4 aoSample = aoTexture.Sample(SampleType, input.texCoord);
+   float3 view = normalize(cameraPos - input.worldPos);
+   float specular_constant = clamp(1.0f - metallicTexture.Sample(SampleType, input.texCoord), 0.01f, 1.0f);
 
-	float NdotL = dot(input.normal, lightDir);
+   float4 ka = float4(0.1f, 0.1f, 0.1f, 1.0f);
+   float4 ambient = textureSample * ka;
 
-	float diffuse_intensity = saturate(NdotL);
-	float kd = diffuse_intensity / (distance / 10);
-	float4 diffuse = textureSample * kd;
+	for (int i = 0; i < numLights; i++)
+	{
+      float4 lightPos = lights[i].position;
+      
+      float3 lightDir = lightPos.xyz - input.worldPos;
 
-	float3 reflected = normalize((2 * NdotL * input.normal) - lightDir);
-	float3 view = normalize(cameraPos.xyz - input.worldPos);
+      kdks += diffuseSpecularFromLight(lightDir, input.normal, view, specular_constant);
+	}
 
-	float4 ka = float4(0.1f, 0.1f, 0.1f, 1.0f);
-	float4 ambient = textureSample * ka;
-	float4 specular = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-	float3 half_vector = normalize(lightDir + view);
-	
-	//float specular_constant = 0.1f;
-	float specular_constant = clamp(1.0f - metallicTexture.Sample(SampleType, input.texCoord), 0.01f, 1.0f);
-
-	specular = (textureSample * NdotL) *
-		pow(saturate(dot(reflected, view)), specular_constant) *
-		((specular_constant + 8.0f) / (8.0f * PI));
-
-	return ambient + (aoSample * (diffuse + specular));
+	return ambient + (aoSample * kdks.x * textureSample) + (kdks.y * textureSample);
 }

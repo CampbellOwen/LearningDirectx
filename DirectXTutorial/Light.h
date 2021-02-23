@@ -6,9 +6,9 @@ namespace Engine
 
 struct LightConstantBuffer
 {
-	DirectX::XMFLOAT4 position;
 	int type;
-	int padding[3];
+	DirectX::XMFLOAT3 padding;
+	DirectX::XMFLOAT4 position;
 };
 
 class Light : public Entity

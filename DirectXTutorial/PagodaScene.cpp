@@ -71,9 +71,14 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 	Engine::Light* light = new Engine::Light("Light");
 	m_entities.emplace("Light", light);
 	AddLight(light);
-	//light->Init(lightMesh, lightMaterial);
-	light->Init(nullptr, nullptr);
+	light->Init(lightMesh, lightMaterial);
 	light->SetPosition(Engine::Axis::Z, 10.0f);
+
+	Engine::Light* light2 = new Engine::Light("Light2");
+	m_entities.emplace(light2->m_name, light2);
+	light2->Init(lightMesh, lightMaterial);
+	AddLight(light2);
+	light2->SetPosition(Engine::Axis::Z, 0.0f);
 
 	{ // Add floor
 		const std::vector<Engine::VERTEX> floorVerts{

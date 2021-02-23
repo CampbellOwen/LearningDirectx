@@ -6,7 +6,7 @@ namespace Engine
 static struct LightsBuffer
 {
 	int numLights;
-	int padding[3];
+	DirectX::XMFLOAT3 padding;
 	LightConstantBuffer lights[Scene::MAX_NUM_LIGHTS];
 };
 

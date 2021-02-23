@@ -10,6 +10,7 @@ class LightMaterial final : public Material
 {
 public:
 	bool Init(const GraphicsDevice& device);
+   void UpdateConstantBuffer(const GraphicsDevice& device, const Entity& entity) override;
 };
 
 } // namespace Engine
