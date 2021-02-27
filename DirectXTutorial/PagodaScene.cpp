@@ -1,11 +1,13 @@
 #include "PagodaScene.h"
 
 #include "Camera.h"
+#include "CubeMap.h"
 #include "ImplicitMesh.h"
 #include "Light.h"
 #include "LightMaterial.h"
 #include "Loaders.h"
 #include "PagodaEntity.h"
+#include "Skybox.h"
 #include "ThreeTextureMaterial.h"
 
 
@@ -15,14 +17,30 @@ namespace Game
 void PagodaScene::Load(const Engine::GraphicsDevice& device)
 {
 
+
+	//Engine::CubeMap* skybox = new Engine::CubeMap();
+	std::array<LPCWSTR, 6> skyboxFiles {
+		L"F:\\Textures\\skyboxes\\green_space\\right.png",
+		L"F:\\Textures\\skyboxes\\green_space\\left.png",
+		L"F:\\Textures\\skyboxes\\green_space\\bottom.png",
+		L"F:\\Textures\\skyboxes\\green_space\\top.png",
+		L"F:\\Textures\\skyboxes\\green_space\\front.png",
+		L"F:\\Textures\\skyboxes\\green_space\\back.png",
+	};
+	//skybox->LoadFromFiles(device.pDevice, skyboxFiles);
+
 	Engine::Camera* camera = new Engine::Camera(device, "Main Camera");
 	camera->MovePosition(Engine::Axis::Z, -20.0f);
 	m_entities.emplace("Main Camera", camera);
 	AddCamera(camera, true);
 
+	std::shared_ptr<Engine::Skybox> skybox = std::make_shared<Engine::Skybox>(device, "green_space_skybox", skyboxFiles);
+	//m_entities.emplace(skybox->m_name, skybox);
+	camera->AddSkybox(skybox);
+
 	const std::vector<Engine::VERTEX> pagodaVerts = Engine::Loaders::LoadObj("F:\\Models\\JapaneseTemple\\model.obj");
 	Engine::Mesh* pagodaMesh = new Engine::Mesh();
-	pagodaMesh->Init(device, pagodaVerts);
+	pagodaMesh->Init<Engine::VERTEX>(device, pagodaVerts);
 
 	m_meshes.emplace("Pagoda", pagodaMesh);
 
@@ -109,7 +127,7 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 		};
 
 		Engine::Mesh* floorMesh = new Engine::Mesh();
-		floorMesh->Init(device, floorVerts);
+		floorMesh->Init<Engine::VERTEX>(device, floorVerts);
 		floorMesh->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_meshes.emplace("Floor", floorMesh);
 

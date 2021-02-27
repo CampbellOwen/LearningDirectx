@@ -73,4 +73,14 @@ void Camera::DrawUI()
       ImGui::End();
 }
 
+void Camera::AddSkybox(std::shared_ptr<Skybox> skybox)
+{
+   m_skybox = skybox;
+}
+
+Skybox* Camera::GetSkybox()
+{
+   return m_skybox.get();
+}
+
 }

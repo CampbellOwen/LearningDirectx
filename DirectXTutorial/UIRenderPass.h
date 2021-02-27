@@ -8,7 +8,7 @@ class UIRenderPass final : public RenderPass
 {
 public:
    UIRenderPass(std::vector<RenderTexture*> outputs);
-   void Render(const GraphicsDevice& device, Scene* scene) override;
+   void Render(const GraphicsDevice& device, std::vector<Entity*> entities) override;
 };
 
 }

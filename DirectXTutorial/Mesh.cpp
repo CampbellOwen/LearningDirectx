@@ -1,39 +1,67 @@
 #include "Mesh.h"
 #include "Utils.h"
 
+#include <vector>
+
 namespace Engine
 {
+	static const std::vector<DirectX::XMFLOAT3> s_CubeVertices {
+		DirectX::XMFLOAT3{ -0.5f, 0.5f, 0.5f }, 
+		{ -0.5f,-0.5f, 0.5f },
+		{ -0.5f,-0.5f,-0.5f },
+
+		{ -0.5f, 0.5f,-0.5f },
+		{ -0.5f,-0.5f,-0.5f },
+		{ 0.5f, 0.5f,-0.5f }, 
+
+		{ 0.5f,-0.5f,-0.5f },
+		{ -0.5f,-0.5f,-0.5f },
+		{ 0.5f,-0.5f, 0.5f },
+
+		{ -0.5f,-0.5f,-0.5f },
+		{ 0.5f,-0.5f,-0.5f },
+		{ 0.5f, 0.5f,-0.5f },
+
+		{ -0.5f, 0.5f,-0.5f },
+		{ -0.5f, 0.5f, 0.5f },
+		{ -0.5f,-0.5f,-0.5f },
+
+		{ -0.5f,-0.5f,-0.5f },
+		{ -0.5f,-0.5f, 0.5f },
+		{ 0.5f,-0.5f, 0.5f },
+
+		{ 0.5f,-0.5f, 0.5f },
+		{ -0.5f,-0.5f, 0.5f },
+		{ -0.5f, 0.5f, 0.5f },
+
+		{ 0.5f, 0.5f,-0.5f },
+		{ 0.5f,-0.5f,-0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+
+		{ 0.5f,-0.5f, 0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+		{ 0.5f,-0.5f,-0.5f },
+
+		{ -0.5f, 0.5f,-0.5f },
+		{ 0.5f, 0.5f,-0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+
+		{ -0.5f, 0.5f, 0.5f },
+		{ -0.5f, 0.5f,-0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+
+		{ 0.5f,-0.5f, 0.5f },
+		{ -0.5f, 0.5f, 0.5f },
+		{ 0.5f, 0.5f, 0.5f },
+	};
 	Mesh::~Mesh()
 	{
 		Destroy();
 	}
 
-	bool Mesh::Init(const GraphicsDevice& device, const std::vector<VERTEX>& vertices)
+	bool Mesh::InitCube(const GraphicsDevice& device)
 	{
-		HRESULT hr;
-		D3D11_BUFFER_DESC bd;
-		ZeroMemory(&bd, sizeof(D3D11_BUFFER_DESC));
-
-		bd.Usage = D3D11_USAGE_DYNAMIC;
-		bd.ByteWidth = (sizeof(VERTEX) * vertices.size());
-		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-		const D3D11_SUBRESOURCE_DATA vertex_data{vertices.data(), 0, 0};
-
-		hr = device.pDevice->CreateBuffer(&bd, &vertex_data, &m_pVBuffer);
-		if (FAILED(hr)) {
-			MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Mesh Error", MB_OK);
-			if (m_pVBuffer) {
-				m_pVBuffer->Release();
-			}
-
-			return false;
-		}
-
-		m_numVertices = vertices.size();
-
-		return true;
+		return Init<DirectX::XMFLOAT3>(device, s_CubeVertices);
 	}
 
 	void Mesh::Destroy()
@@ -43,7 +71,7 @@ namespace Engine
 
 	void Mesh::Activate(ID3D11DeviceContext* deviceContext)
 	{
-		UINT stride = sizeof(VERTEX);
+		UINT stride = m_vertexSize;
 		UINT offset = 0;
 
 		deviceContext->IASetVertexBuffers(0, 1, &m_pVBuffer, &stride, &offset);

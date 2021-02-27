@@ -17,7 +17,7 @@ class RenderPass
 public:
     RenderPass(Material* material, std::vector<RenderTexture*> outputs);
     RenderPass(const GraphicsDevice& device, Material* material, uint32_t width, uint32_t height, uint32_t numOutputs);
-    virtual void Render(const GraphicsDevice& device, Scene* scene);
+    virtual void Render(const GraphicsDevice& device, std::vector<Entity*> entities);
     void SetClearColour(float colour[4]);
     void EnableClearOutput();
     void DisableClearOutput();

@@ -11,7 +11,7 @@ UIRenderPass::UIRenderPass(std::vector<RenderTexture*> outputs) : RenderPass(nul
 {
 }
 
-void UIRenderPass::Render(const GraphicsDevice& device, Scene* scene)
+void UIRenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entities)
 {
    assert(m_outputs.size() == 1);
    
@@ -21,7 +21,7 @@ void UIRenderPass::Render(const GraphicsDevice& device, Scene* scene)
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-   for (const auto& entity : scene->GetEntities())
+   for (const auto& entity : entities)
    {
       entity->DrawUI();
    }

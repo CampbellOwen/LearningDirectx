@@ -73,10 +73,7 @@ namespace Loaders
 		return vertices;
 	}
 
-	HRESULT LoadImage(
-		ID3D11Device* device, 
-		LPCWSTR filename, 
-		ID3D11Texture2D** texture)
+	HRESULT LoadImage( LPCWSTR filename, DiskImage* imageOut)
 	{
 		IWICBitmapDecoder* pDecoder = nullptr;
 		IWICBitmapFrameDecode* pFrame = nullptr;
@@ -134,40 +131,16 @@ namespace Loaders
 
 			hr = pBitmapFlipRotator->CopyPixels(&rcLock, 4 * width, width * height * 4, rawBuffer.get());
 
+
 			if (FAILED(hr)) {
 				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Copy Pixels", MB_OK);
 				goto cleanup;
 			}
 
-			D3D11_TEXTURE2D_DESC desc;
-			ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+			imageOut->height = height;
+			imageOut->width = width;
+			imageOut->spBuffer = std::move(rawBuffer);
 
-			desc.Width = width;
-			desc.Height = height;
-			desc.MipLevels = 1;
-			desc.ArraySize = 1;
-			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-			desc.Usage = D3D11_USAGE_DEFAULT;
-			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-			desc.CPUAccessFlags = 0;
-			desc.MiscFlags = 0;
-
-			D3D11_SUBRESOURCE_DATA initData;
-			ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-			initData.pSysMem = rawBuffer.get();
-			initData.SysMemPitch = (width * 4);
-			initData.SysMemSlicePitch = (width * height);
-
-			ID3D11Texture2D* tex = nullptr;
-			hr = device->CreateTexture2D(&desc, &initData, &tex);
-			if (FAILED(hr)) {
-				MessageBoxA(nullptr, Engine::Utils::GetHRErrorString(hr).c_str(), "Create Texure", MB_OK);
-				goto cleanup;
-			}
-
-			*texture = tex;
 		}
 
 cleanup:

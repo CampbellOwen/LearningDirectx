@@ -35,7 +35,7 @@ RenderPass::RenderPass(const GraphicsDevice& device, Material* material, uint32_
 
 }
 
-void RenderPass::Render(const GraphicsDevice& device, Scene* scene)
+void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entities)
 {
    bool useEntityMaterial = m_material == nullptr;
     if (!useEntityMaterial)
@@ -56,7 +56,7 @@ void RenderPass::Render(const GraphicsDevice& device, Scene* scene)
 
     device.Context()->OMSetRenderTargets(m_outputs.size(), renderTargets.data(), device.pDepthStencilView);
 
-    for (auto& entity : scene->GetEntities())
+    for (auto& entity : entities)
     {
         entity->Bind(device, useEntityMaterial);
 

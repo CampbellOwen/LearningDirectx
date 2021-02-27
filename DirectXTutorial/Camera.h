@@ -1,8 +1,10 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <memory>
 
 #include "Entity.h"
+#include "Skybox.h"
 
 namespace Engine 
 {
@@ -24,6 +26,9 @@ public:
 	void Bind(const GraphicsDevice& device, bool useMaterial) override;
 	void DrawUI() override;
 
+	void AddSkybox(std::shared_ptr<Skybox> skybox);
+	Skybox* GetSkybox();
+
 private:
 
 private:
@@ -32,6 +37,8 @@ private:
    float m_aspectRatio;
    float m_nearClippingPlane;
    float m_farClippingPane;
+
+	std::shared_ptr<Skybox> m_skybox;
 
 	GPUBuffer m_gpuBuffer;
 };

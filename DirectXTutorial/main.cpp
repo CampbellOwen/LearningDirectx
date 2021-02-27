@@ -22,6 +22,7 @@
 #include "RenderPass.h"
 #include "RenderTexture.h"
 #include "Scene.h"
+#include "Skybox.h"
 #include "ThreeTextureMaterial.h"
 #include "UIRenderPass.h"
 #include "Utils.h"
@@ -38,7 +39,7 @@ static Engine::UI::ImGuiInterface ui;
 static Engine::GraphicsDevice *sp_graphicsDevice;
 static Engine::GPUBuffer cameraConstantBuffer;
 
-static Engine::RenderPass* mainRenderPass;
+static Engine::RenderPass* forwardRenderPass;
 static Engine::RenderPass* normalsPass;
 static Engine::UIRenderPass* uiPass;
 
@@ -166,7 +167,7 @@ void InitD3D(HWND hWnd)
 {
 	sp_graphicsDevice = new Engine::GraphicsDevice(hWnd, SCREEN_WIDTH, SCREEN_HEIGHT);
 	std::vector<Engine::RenderTexture*> target { &sp_graphicsDevice->backbufferRenderTexture };
-	mainRenderPass = new Engine::RenderPass(nullptr, target);
+	forwardRenderPass = new Engine::RenderPass(nullptr, target);
 
 	screenSpaceNormals = new Engine::RenderTexture(
 		*sp_graphicsDevice,
@@ -213,7 +214,7 @@ void RenderFrame(void)
 	// Clear render targets
 	Engine::ClearDepth(*sp_graphicsDevice, sp_graphicsDevice->pDepthStencilView);
 	//Engine::ClearRenderTarget(*sp_graphicsDevice, sp_graphicsDevice->backbufferRenderTexture, ui.ObjectState().backgroundColor);
-	mainRenderPass->SetClearColour(ui.ObjectState().backgroundColor);
+	forwardRenderPass->SetClearColour(ui.ObjectState().backgroundColor);
 
 
     pagodaScene->BindCameras(*sp_graphicsDevice);
@@ -250,9 +251,26 @@ void RenderFrame(void)
 
 	//Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
 
-	normalsPass->Render(*sp_graphicsDevice, pagodaScene);
-	mainRenderPass->Render(*sp_graphicsDevice, pagodaScene);
-	uiPass->Render(*sp_graphicsDevice, pagodaScene);
+	std::vector<Engine::Entity*> sceneEntities = pagodaScene->GetEntities();
+
+	normalsPass->Render(*sp_graphicsDevice, sceneEntities);
+
+	forwardRenderPass->EnableClearOutput();
+	forwardRenderPass->Render(*sp_graphicsDevice, sceneEntities);
+
+	Engine::Camera* sceneCamera = pagodaScene->GetCamera();
+	if (sceneCamera)
+	{
+		Engine::Skybox* skybox = sceneCamera->GetSkybox();
+		if (skybox)
+		{
+			forwardRenderPass->DisableClearOutput();
+			forwardRenderPass->Render(*sp_graphicsDevice, { skybox });
+		}
+	}
+
+	uiPass->Render(*sp_graphicsDevice, sceneEntities);
+
 
 	// Render UI last to draw on top of scene
 	//ui.Render();

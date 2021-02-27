@@ -39,6 +39,10 @@ public:
 	void BindLights(const GraphicsDevice& device);
 
 	std::vector<Entity*> GetEntities();
+	Camera* GetCamera()
+	{
+		return activeCamera;
+	}
 
 	~Scene();
 

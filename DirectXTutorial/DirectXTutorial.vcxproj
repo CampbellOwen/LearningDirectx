@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="ImGuiInterface.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="RenderNormalsMaterial.cpp" />
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderTexture.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="ThreeTextureMaterial.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -184,6 +186,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Skybox.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="ThreeTexturePhong.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -196,6 +202,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CubeMap.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="ImGuiInterface.h" />
@@ -216,6 +223,7 @@
     <ClInclude Include="RenderNormalsMaterial.h" />
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderTexture.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="ThreeTextureMaterial.h" />
     <ClInclude Include="RenderPipeline.h" />
     <ClInclude Include="Sampler.h" />
