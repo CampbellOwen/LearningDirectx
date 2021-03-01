@@ -63,7 +63,7 @@ void RenderPass::Render(const GraphicsDevice& device, std::vector<Entity*> entit
         Engine::Mesh* mesh = entity->GetMesh();
         if (mesh)
         {
-           device.Context()->Draw(mesh->NumberVertices(), 0);
+           device.Context()->DrawIndexed(mesh->NumberIndices(), 0, 0);
         }
     }
 

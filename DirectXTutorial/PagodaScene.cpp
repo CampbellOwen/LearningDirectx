@@ -38,9 +38,9 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 	//m_entities.emplace(skybox->m_name, skybox);
 	camera->AddSkybox(skybox);
 
-	const std::vector<Engine::VERTEX> pagodaVerts = Engine::Loaders::LoadObj("F:\\Models\\JapaneseTemple\\model.obj");
+	auto pagodaMeshData = Engine::Loaders::LoadObj("F:\\Models\\JapaneseTemple\\model.obj");
 	Engine::Mesh* pagodaMesh = new Engine::Mesh();
-	pagodaMesh->Init<Engine::VERTEX>(device, pagodaVerts);
+	pagodaMesh->Init<Engine::VERTEX>(device, pagodaMeshData.first, pagodaMeshData.second);
 
 	m_meshes.emplace("Pagoda", pagodaMesh);
 
@@ -125,10 +125,13 @@ void PagodaScene::Load(const Engine::GraphicsDevice& device)
 				DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f), // Color;
 			},
 		};
+		const std::vector<uint32_t> floorIndices {
+			0,1,2,
+			2,1,3
+		};
 
 		Engine::Mesh* floorMesh = new Engine::Mesh();
-		floorMesh->Init<Engine::VERTEX>(device, floorVerts);
-		floorMesh->SetTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		floorMesh->Init<Engine::VERTEX>(device, floorVerts, floorIndices);
 		m_meshes.emplace("Floor", floorMesh);
 
 		Engine::Texture* floorTexture = new Engine::Texture();

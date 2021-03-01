@@ -15,15 +15,64 @@ namespace Engine
 {
 namespace Loaders
 {
-	std::vector<Engine::VERTEX> LoadObj(const std::string& filename)
+	std::pair<std::vector<Engine::VERTEX>, std::vector<uint32_t>> LoadObj(const std::string& filename)
 	{
+		std::string err;
+		std::string warn;
+
+		/*
+		    tinyobj::ObjReader reader;
+    reader.ParseFromFile(nvh::findFile("scenes/CornellBox-Original-Merged.obj", searchPaths));
+    assert(reader.Valid());
+
+    const std::vector<tinyobj::real_t> objVertices = reader.GetAttrib().GetVertices();
+    const std::vector<tinyobj::shape_t>& objShapes = reader.GetShapes();
+    assert(objShapes.size() == 1);
+    const tinyobj::shape_t& objShape = objShapes[0];
+
+    std::vector<uint32_t> objIndices;
+    objIndices.reserve(objShape.mesh.indices.size());
+    for (const tinyobj::index_t& index : objShape.mesh.indices)
+    {
+        objIndices.push_back(index.vertex_index);
+    }
+
+		*/
+
+		//tinyobj::ObjReader reader;
+		//reader.ParseFromFile(filename);
+		//assert(reader.Valid());
+		//const std::vector<tinyobj::real_t> objVertices = reader.GetAttrib().GetVertices();
+		//const auto objNormals = reader.GetAttrib().normals;
+		//const auto objUV = reader.GetAttrib().texcoords;
+		//assert(objVertices.size() == objNormals.size() && objNormals.size() == objUV.size());
+
+		//const auto shapes = reader.GetShapes();
+		//assert(shapes.size() > 1);
+		//const auto objIndices = shapes[0].mesh.indices;
+
+		//assert(shapes[0].mesh.num_face_vertices[0] == 3);
+
+		//std::vector<Engine::VERTEX> vertices;
+		//for (int i = 0, uv = 0; i < objVertices.size(), uv < objUV.size(); i += 3, uv += 2)
+		//{
+		//	vertices.emplace_back(
+		//		DirectX::XMFLOAT3(objVertices[i], objVertices[i+1], objVertices[i+2]),
+		//		DirectX::XMFLOAT3(objNormals[i], objNormals[i+1], objNormals[i+2]),
+		//		DirectX::XMFLOAT2(objUV[uv], objUV[uv+1]),
+		//		DirectX::XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f)
+		//	);
+		//}
+
+		//std::vector<uint32_t> indices;
+		//for (const auto& index : objIndices)
+		//{
+		//	indices.push_back(static_cast<uint32_t>(index));
+		//}
+			
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
 		std::vector<tinyobj::material_t> materials;
-
-		std::string err;
-		std::string warn;
-			
 		bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
 		if (!warn.empty()) {
 			//MessageBoxA(nullptr, warn.c_str(), "tinyobj warning", MB_OK);
@@ -35,13 +84,16 @@ namespace Loaders
 			return {};
 		}
 
-		std::vector<Engine::VERTEX> vertices;
+		std::vector<uint32_t> indices;
+		std::vector<VERTEX> vertices;
 
 		for (auto shape : shapes)
 		{
 			size_t index_offset = 0;
+
 			for (size_t f = 0; f < shape.mesh.num_face_vertices.size(); f++) 
 			{
+
 				int numFaceVertices = shape.mesh.num_face_vertices[f];
 				for (size_t vIndex = 0; vIndex < numFaceVertices; vIndex++) 
 				{
@@ -64,13 +116,15 @@ namespace Loaders
 						{0.5, 0.5, 0.5, 1.0}
 						});
 
+					indices.push_back(index_offset + vIndex);
+
 				}
 
 				index_offset += numFaceVertices;
 			}
 		}
 
-		return vertices;
+		return std::make_pair(vertices, indices);
 	}
 
 	HRESULT LoadImage( LPCWSTR filename, DiskImage* imageOut)

@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace Engine
@@ -19,7 +20,7 @@ struct DiskImage
 	uint32_t width, height;
 };
 
-	std::vector<Engine::VERTEX> LoadObj(const std::string& filename);
+	std::pair<std::vector<Engine::VERTEX>, std::vector<uint32_t>> LoadObj(const std::string& filename);
 	HRESULT LoadImage( LPCWSTR filename, DiskImage* imageOut );
 
 } // namespace Loaders
