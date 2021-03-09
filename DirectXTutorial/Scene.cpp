@@ -43,7 +43,10 @@ void Scene::AddCamera(Camera* camera, bool active)
 
 void Scene::BindCameras(const GraphicsDevice& device)
 {
-	activeCamera->Bind(device, false);
+	if (activeCamera)
+	{
+		activeCamera->Bind(device, false);
+	}
 }
 
 std::vector<Entity*> Scene::GetEntities()

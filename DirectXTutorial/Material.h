@@ -38,9 +38,10 @@ namespace Engine
 
 		virtual void UpdateConstantBuffer(const GraphicsDevice& device, const Entity& entity) 
 		{ 
-
 		}
 
+		virtual void DrawUI()
+		{ }
 
 	protected:
 		GPUBuffer m_gpuBuffer;

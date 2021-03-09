@@ -101,6 +101,11 @@ public:
       }
 
       ImGui::End();
+
+		if (m_pMaterial)
+		{
+			m_pMaterial->DrawUI();
+		}
 	}
 
 	DirectX::XMMATRIX GetTransform() const

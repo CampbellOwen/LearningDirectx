@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantPbrMaterial.cpp" />
     <ClCompile Include="CubeMap.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
@@ -164,6 +165,7 @@
     <ClCompile Include="RenderPass.cpp" />
     <ClCompile Include="RenderTexture.cpp" />
     <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="SphereScene.cpp" />
     <ClCompile Include="ThreeTextureMaterial.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -172,6 +174,18 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="ConstantPbr.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="light.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -202,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ConstantPbrMaterial.h" />
     <ClInclude Include="CubeMap.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="GraphicsDevice.h" />
@@ -224,6 +239,7 @@
     <ClInclude Include="RenderPass.h" />
     <ClInclude Include="RenderTexture.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SphereScene.h" />
     <ClInclude Include="ThreeTextureMaterial.h" />
     <ClInclude Include="RenderPipeline.h" />
     <ClInclude Include="Sampler.h" />

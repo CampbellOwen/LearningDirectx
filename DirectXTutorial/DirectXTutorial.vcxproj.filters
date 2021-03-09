@@ -99,6 +99,12 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SphereScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantPbrMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Material.h">
@@ -203,12 +209,19 @@
     <ClInclude Include="Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SphereScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantPbrMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="light.hlsl" />
     <FxCompile Include="ThreeTexturePhong.hlsl" />
     <FxCompile Include="RenderNormals.hlsl" />
     <FxCompile Include="Skybox.hlsl" />
+    <FxCompile Include="ConstantPbr.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

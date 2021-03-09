@@ -17,7 +17,6 @@
 #include "Loaders.h"
 #include "Material.h"
 #include "Mesh.h"
-#include "PagodaScene.h"
 #include "RenderNormalsMaterial.h"
 #include "RenderPass.h"
 #include "RenderTexture.h"
@@ -26,6 +25,9 @@
 #include "ThreeTextureMaterial.h"
 #include "UIRenderPass.h"
 #include "Utils.h"
+
+#include "PagodaScene.h"
+#include "SphereScene.h"
 
 // Direct 3D Library files
 #pragma comment(lib, "d3d11.lib")
@@ -46,7 +48,7 @@ static Engine::UIRenderPass* uiPass;
 static Engine::RenderTexture* screenSpaceNormals;
 static Engine::RenderNormalsMaterial* normalsMaterial;
 
-static Engine::Scene *pagodaScene;
+static Engine::Scene *scene;
 static DirectX::XMMATRIX perspectiveMatrix;
 
 void InitD3D(HWND hWnd);
@@ -190,7 +192,7 @@ void InitD3D(HWND hWnd)
 void CleanD3D()
 {
 	delete sp_graphicsDevice;
-	delete pagodaScene;
+	delete scene;
 }
 
 struct CameraConstantBuffer
@@ -203,7 +205,7 @@ struct CameraConstantBuffer
 
 void Update()
 {
-	for (auto &entity : pagodaScene->GetEntities())
+	for (auto &entity : scene->GetEntities())
 	{
 		entity->Update(*sp_graphicsDevice);
 	}
@@ -217,8 +219,8 @@ void RenderFrame(void)
 	forwardRenderPass->SetClearColour(ui.ObjectState().backgroundColor);
 
 
-    pagodaScene->BindCameras(*sp_graphicsDevice);
-    pagodaScene->BindLights(*sp_graphicsDevice);
+    scene->BindCameras(*sp_graphicsDevice);
+    scene->BindLights(*sp_graphicsDevice);
 
 
 	// Update constant buffer
@@ -251,14 +253,14 @@ void RenderFrame(void)
 
 	//Engine::BindConstantBuffer(*sp_graphicsDevice, cameraConstantBuffer, 0);
 
-	std::vector<Engine::Entity*> sceneEntities = pagodaScene->GetEntities();
+	std::vector<Engine::Entity*> sceneEntities = scene->GetEntities();
 
 	normalsPass->Render(*sp_graphicsDevice, sceneEntities);
 
 	forwardRenderPass->EnableClearOutput();
 	forwardRenderPass->Render(*sp_graphicsDevice, sceneEntities);
 
-	Engine::Camera* sceneCamera = pagodaScene->GetCamera();
+	Engine::Camera* sceneCamera = scene->GetCamera();
 	if (sceneCamera)
 	{
 		Engine::Skybox* skybox = sceneCamera->GetSkybox();
@@ -281,10 +283,13 @@ void RenderFrame(void)
 
 void InitPipeline(void)
 {
-	pagodaScene = new Game::PagodaScene(*sp_graphicsDevice);
-	pagodaScene->Load(*sp_graphicsDevice);
+	//scene = new Game::PagodaScene(*sp_graphicsDevice);
+	//scene->Load(*sp_graphicsDevice);
 
-	pagodaScene->GetEntity("Floor")->GetMaterial()->AddTexture(screenSpaceNormals);
+	//scene->GetEntity("Floor")->GetMaterial()->AddTexture(screenSpaceNormals);
+
+	scene = new Game::SphereScene(*sp_graphicsDevice);
+	scene->Load(*sp_graphicsDevice);
 
 	//perspectiveConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(Engine::PerspectiveConstantBuffer));
 	cameraConstantBuffer = Engine::CreateConstantBuffer(*sp_graphicsDevice, sizeof(CameraConstantBuffer), nullptr);
