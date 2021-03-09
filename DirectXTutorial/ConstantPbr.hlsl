@@ -119,5 +119,5 @@ float4 PShader(VOut input) : SV_TARGET
 	else if (useEarlHammon)
 		Fd = EarlHammonDiffuseBRDF(NoV);
 
-	return float4(albedo, 1.0f) * ((1 - fresnel) * Fd) * NoL;
+	return float4(albedo, 1.0f) * Fd * NoL;
 }
